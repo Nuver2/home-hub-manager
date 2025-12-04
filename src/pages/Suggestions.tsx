@@ -14,6 +14,7 @@ import {
   X,
   Clock,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -105,10 +106,12 @@ export default function Suggestions() {
             </p>
           </div>
           {!isParent && (
-            <Button variant="accent">
-              <Plus className="h-4 w-4" />
-              New Suggestion
-            </Button>
+            <Link to="/suggestions/new">
+              <Button variant="accent">
+                <Plus className="h-4 w-4" />
+                New Suggestion
+              </Button>
+            </Link>
           )}
         </div>
 
@@ -229,10 +232,12 @@ export default function Suggestions() {
                   : 'Share your ideas to improve the household'}
             </p>
             {!isParent && (
-              <Button variant="accent">
-                <Plus className="h-4 w-4" />
-                Create Suggestion
-              </Button>
+              <Link to="/suggestions/new">
+                <Button variant="accent">
+                  <Plus className="h-4 w-4" />
+                  Create Suggestion
+                </Button>
+              </Link>
             )}
           </div>
         )}
