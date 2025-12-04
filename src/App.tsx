@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 // Pages
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 import ShoppingLists from "./pages/ShoppingLists";
@@ -71,6 +72,11 @@ function AppRoutes() {
       <Route path="/login" element={
         <PublicRoute>
           <Login />
+        </PublicRoute>
+      } />
+      <Route path="/signup" element={
+        <PublicRoute>
+          <Signup />
         </PublicRoute>
       } />
 

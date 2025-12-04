@@ -8,26 +8,40 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Home, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function Login() {
+export default function Signup() {
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const { error } = await login(email, password);
+      const { error } = await signup(email, password, name, username, 'parent');
       if (error) {
         setError(error);
       } else {
-        toast.success('Welcome back!');
-        navigate('/dashboard');
+        toast.success('Account created successfully! Please sign in.');
+        navigate('/login');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.');
@@ -47,15 +61,15 @@ export default function Login() {
             </div>
           </div>
           <h1 className="text-3xl font-bold tracking-tight">HomeHub</h1>
-          <p className="text-muted-foreground">Household Staff Management</p>
+          <p className="text-muted-foreground">Create your admin account</p>
         </div>
 
-        {/* Login Card */}
+        {/* Signup Card */}
         <Card className="border-0 shadow-medium">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl">Sign in</CardTitle>
+            <CardTitle className="text-xl">Sign up</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Create your account to get started
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -66,6 +80,30 @@ export default function Login() {
                   <span>{error}</span>
                 </div>
               )}
+
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Choose a username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -85,11 +123,24 @@ export default function Login() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Create a password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  autoComplete="current-password"
+                  autoComplete="new-password"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
                 />
               </div>
 
@@ -101,14 +152,14 @@ export default function Login() {
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                Sign In
+                Create Account
               </Button>
             </form>
 
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-accent hover:underline font-medium">
-                Sign up
+              Already have an account?{' '}
+              <Link to="/login" className="text-accent hover:underline font-medium">
+                Sign in
               </Link>
             </div>
           </CardContent>

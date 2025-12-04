@@ -80,7 +80,7 @@ export default function Settings() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" defaultValue={user?.phoneNumber} />
+                <Input id="phone" defaultValue={user?.phone_number || ''} />
               </div>
             </div>
 
