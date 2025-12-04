@@ -1,0 +1,202 @@
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  LayoutDashboard,
+  CheckSquare,
+  ShoppingCart,
+  FolderKanban,
+  Users,
+  Lightbulb,
+  Activity,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Home,
+  Bell,
+} from 'lucide-react';
+import { useState } from 'react';
+import { mockNotifications } from '@/data/mockData';
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
+  badge?: number;
+}
+
+const navItems: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Tasks', href: '/tasks', icon: CheckSquare },
+  { label: 'Shopping Lists', href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
+  { label: 'Projects', href: '/projects', icon: FolderKanban, roles: ['parent'] },
+  { label: 'Staff', href: '/staff', icon: Users, roles: ['parent'] },
+  { label: 'Suggestions', href: '/suggestions', icon: Lightbulb },
+  { label: 'Activity Log', href: '/activity', icon: Activity, roles: ['parent'] },
+];
+
+export function Sidebar() {
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const unreadNotifications = mockNotifications.filter(n => !n.read).length;
+
+  const filteredNavItems = navItems.filter(item => {
+    if (!item.roles) return true;
+    return user && item.roles.includes(user.role);
+  });
+
+  const getRoleLabel = (role: string) => {
+    const labels: Record<string, string> = {
+      parent: 'Administrator',
+      driver: 'Driver',
+      chef: 'Chef',
+      cleaner: 'Cleaner',
+      other: 'Staff',
+    };
+    return labels[role] || role;
+  };
+
+  const SidebarContent = () => (
+    <div className="flex h-full flex-col">
+      {/* Logo */}
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary">
+          <Home className="h-5 w-5 text-sidebar-primary-foreground" />
+        </div>
+        <div>
+          <h1 className="font-semibold text-sidebar-foreground">HomeHub</h1>
+          <p className="text-xs text-sidebar-foreground/60">Staff Management</p>
+        </div>
+      </div>
+
+      {/* User Info */}
+      <div className="px-4 py-4 border-b border-sidebar-border">
+        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent p-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground font-medium">
+            {user?.name.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sidebar-foreground truncate">{user?.name}</p>
+            <p className="text-xs text-sidebar-foreground/60">{getRoleLabel(user?.role || '')}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <ul className="space-y-1">
+          {filteredNavItems.map((item) => {
+            const isActive = location.pathname === item.href || 
+              (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
+            const Icon = item.icon;
+            
+            return (
+              <li key={item.href}>
+                <Link
+                  to={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                  {item.badge && item.badge > 0 && (
+                    <Badge variant="warning" className="ml-auto">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* Bottom Actions */}
+      <div className="border-t border-sidebar-border p-3 space-y-1">
+        <Link
+          to="/notifications"
+          onClick={() => setIsOpen(false)}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200"
+        >
+          <Bell className="h-5 w-5" />
+          <span>Notifications</span>
+          {unreadNotifications > 0 && (
+            <Badge variant="destructive" className="ml-auto">
+              {unreadNotifications}
+            </Badge>
+          )}
+        </Link>
+        <Link
+          to="/settings"
+          onClick={() => setIsOpen(false)}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200"
+        >
+          <Settings className="h-5 w-5" />
+          <span>Settings</span>
+        </Link>
+        <button
+          onClick={logout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-destructive/20 hover:text-destructive transition-all duration-200"
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile Header */}
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background px-4 lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+            <Home className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <span className="font-semibold">HomeHub</span>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <aside
+        className={cn(
+          "fixed top-0 left-0 z-50 h-full w-72 bg-sidebar transform transition-transform duration-300 ease-in-out lg:hidden",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <SidebarContent />
+      </aside>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:block lg:w-72 lg:bg-sidebar">
+        <SidebarContent />
+      </aside>
+    </>
+  );
+}
