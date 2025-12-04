@@ -5,6 +5,7 @@ import { TaskCard } from '@/components/tasks/TaskCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -15,17 +16,16 @@ import {
 import {
   Plus,
   Search,
-  Filter,
   LayoutGrid,
   List,
 } from 'lucide-react';
-import { mockTasks } from '@/data/mockData';
 import { Link } from 'react-router-dom';
-import { Task, TaskStatus, TaskPriority, TaskCategory } from '@/types';
 import { cn } from '@/lib/utils';
+import { useTasks } from '@/hooks/useTasks';
 
 export default function Tasks() {
   const { user } = useAuth();
+  const { data: tasks = [], isLoading } = useTasks();
   const isParent = user?.role === 'parent';
   
   const [search, setSearch] = useState('');
@@ -34,15 +34,7 @@ export default function Tasks() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Filter tasks for current user
-  const userTasks = isParent 
-    ? mockTasks 
-    : mockTasks.filter(t => 
-        t.assignedUsers.some(u => u.id === user?.id) || 
-        (user?.role && t.assignedRoles?.includes(user.role))
-      );
-
-  const filteredTasks = userTasks.filter(task => {
+  const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase()) ||
       task.description?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
@@ -53,12 +45,32 @@ export default function Tasks() {
   });
 
   const statusCounts = {
-    all: userTasks.length,
-    to_do: userTasks.filter(t => t.status === 'to_do').length,
-    in_progress: userTasks.filter(t => t.status === 'in_progress').length,
-    completed: userTasks.filter(t => t.status === 'completed').length,
-    on_hold: userTasks.filter(t => t.status === 'on_hold').length,
+    all: tasks.length,
+    to_do: tasks.filter(t => t.status === 'to_do').length,
+    in_progress: tasks.filter(t => t.status === 'in_progress').length,
+    completed: tasks.filter(t => t.status === 'completed').length,
+    on_hold: tasks.filter(t => t.status === 'on_hold').length,
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-32 mb-2" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Skeleton key={i} className="h-48 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

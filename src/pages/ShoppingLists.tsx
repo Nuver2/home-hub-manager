@@ -5,6 +5,7 @@ import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -17,29 +18,21 @@ import {
   Search,
   ShoppingCart,
 } from 'lucide-react';
-import { mockShoppingLists } from '@/data/mockData';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useShoppingLists } from '@/hooks/useShoppingLists';
 
 export default function ShoppingLists() {
   const { user } = useAuth();
+  const { data: shoppingLists = [], isLoading } = useShoppingLists();
   const isParent = user?.role === 'parent';
   const isChef = user?.role === 'chef';
-  const isDriver = user?.role === 'driver';
   
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
-  // Filter shopping lists for current user
-  const userLists = isParent
-    ? mockShoppingLists
-    : mockShoppingLists.filter(l => 
-        l.createdBy.id === user?.id || 
-        l.assignedTo?.id === user?.id
-      );
-
-  const filteredLists = userLists.filter(list => {
+  const filteredLists = shoppingLists.filter(list => {
     const matchesSearch = list.title.toLowerCase().includes(search.toLowerCase()) ||
       list.notes?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || list.status === statusFilter;
@@ -56,6 +49,26 @@ export default function ShoppingLists() {
     { value: 'delivered', label: 'Delivered' },
     { value: 'completed', label: 'Completed' },
   ];
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Skeleton key={i} className="h-56 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -86,8 +99,8 @@ export default function ShoppingLists() {
         <div className="flex flex-wrap gap-2">
           {statusTabs.map((tab) => {
             const count = tab.value === 'all' 
-              ? userLists.length 
-              : userLists.filter(l => l.status === tab.value).length;
+              ? shoppingLists.length 
+              : shoppingLists.filter(l => l.status === tab.value).length;
             
             return (
               <button

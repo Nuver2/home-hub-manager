@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -19,9 +20,9 @@ import {
   Lightbulb,
   FolderKanban,
 } from 'lucide-react';
-import { mockActivityLog } from '@/data/mockData';
 import { Navigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { useActivityLog } from '@/hooks/useActivityLog';
 
 const targetTypeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   task: CheckSquare,
@@ -40,6 +41,7 @@ const actionColors: Record<string, string> = {
 
 export default function ActivityLog() {
   const { user } = useAuth();
+  const { data: activities = [], isLoading } = useActivityLog();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [actionFilter, setActionFilter] = useState<string>('all');
@@ -49,14 +51,32 @@ export default function ActivityLog() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const filteredActivities = mockActivityLog.filter(activity => {
+  const filteredActivities = activities.filter(activity => {
     const matchesSearch = activity.details?.toLowerCase().includes(search.toLowerCase()) ||
-      activity.user.name.toLowerCase().includes(search.toLowerCase());
-    const matchesType = typeFilter === 'all' || activity.targetType === typeFilter;
+      activity.userProfile?.name?.toLowerCase().includes(search.toLowerCase());
+    const matchesType = typeFilter === 'all' || activity.target_type === typeFilter;
     const matchesAction = actionFilter === 'all' || activity.action === actionFilter;
     
     return matchesSearch && matchesType && matchesAction;
   });
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div>
+            <Skeleton className="h-8 w-40 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map(i => (
+              <Skeleton key={i} className="h-24 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -111,7 +131,7 @@ export default function ActivityLog() {
         {filteredActivities.length > 0 ? (
           <div className="space-y-4">
             {filteredActivities.map((activity, index) => {
-              const Icon = targetTypeIcons[activity.targetType] || Activity;
+              const Icon = targetTypeIcons[activity.target_type] || Activity;
               
               return (
                 <div
@@ -124,19 +144,19 @@ export default function ActivityLog() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="font-medium">{activity.user.name}</span>
+                      <span className="font-medium">{activity.userProfile?.name || 'Unknown User'}</span>
                       <span className={actionColors[activity.action] || 'text-muted-foreground'}>
                         {activity.action.replace('_', ' ')}
                       </span>
                       <Badge variant="outline" className="text-xs">
-                        {activity.targetType.replace('_', ' ')}
+                        {activity.target_type.replace('_', ' ')}
                       </Badge>
                     </div>
                     {activity.details && (
                       <p className="text-sm text-muted-foreground">{activity.details}</p>
                     )}
                     <p className="text-xs text-muted-foreground mt-2">
-                      {format(new Date(activity.createdAt), 'MMM d, yyyy • h:mm a')}
+                      {format(new Date(activity.created_at), 'MMM d, yyyy • h:mm a')}
                     </p>
                   </div>
                 </div>

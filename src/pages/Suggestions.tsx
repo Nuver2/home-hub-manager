@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus,
   Search,
@@ -13,10 +14,10 @@ import {
   X,
   Clock,
 } from 'lucide-react';
-import { mockSuggestions } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useSuggestions, useUpdateSuggestion } from '@/hooks/useSuggestions';
 
 const statusVariants: Record<string, 'warning' | 'success' | 'destructive'> = {
   pending: 'warning',
@@ -32,18 +33,14 @@ const statusIcons: Record<string, React.ComponentType<{ className?: string }>> =
 
 export default function Suggestions() {
   const { user } = useAuth();
+  const { data: suggestions = [], isLoading } = useSuggestions();
+  const updateSuggestion = useUpdateSuggestion();
   const isParent = user?.role === 'parent';
   
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [suggestions, setSuggestions] = useState(mockSuggestions);
 
-  // Filter suggestions for current user
-  const userSuggestions = isParent
-    ? suggestions
-    : suggestions.filter(s => s.createdBy.id === user?.id);
-
-  const filteredSuggestions = userSuggestions.filter(suggestion => {
+  const filteredSuggestions = suggestions.filter(suggestion => {
     const matchesSearch = suggestion.title.toLowerCase().includes(search.toLowerCase()) ||
       suggestion.description.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || suggestion.status === statusFilter;
@@ -51,18 +48,22 @@ export default function Suggestions() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleApprove = (id: string) => {
-    setSuggestions(prev => 
-      prev.map(s => s.id === id ? { ...s, status: 'approved' as const } : s)
-    );
-    toast.success('Suggestion approved');
+  const handleApprove = async (id: string) => {
+    try {
+      await updateSuggestion.mutateAsync({ id, status: 'approved' });
+      toast.success('Suggestion approved');
+    } catch (error) {
+      toast.error('Failed to approve suggestion');
+    }
   };
 
-  const handleReject = (id: string) => {
-    setSuggestions(prev => 
-      prev.map(s => s.id === id ? { ...s, status: 'rejected' as const } : s)
-    );
-    toast.success('Suggestion rejected');
+  const handleReject = async (id: string) => {
+    try {
+      await updateSuggestion.mutateAsync({ id, status: 'rejected' });
+      toast.success('Suggestion rejected');
+    } catch (error) {
+      toast.error('Failed to reject suggestion');
+    }
   };
 
   const statusTabs = [
@@ -71,6 +72,26 @@ export default function Suggestions() {
     { value: 'approved', label: 'Approved' },
     { value: 'rejected', label: 'Rejected' },
   ];
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-40 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <Skeleton key={i} className="h-40 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -95,8 +116,8 @@ export default function Suggestions() {
         <div className="flex flex-wrap gap-2">
           {statusTabs.map((tab) => {
             const count = tab.value === 'all' 
-              ? userSuggestions.length 
-              : userSuggestions.filter(s => s.status === tab.value).length;
+              ? suggestions.length 
+              : suggestions.filter(s => s.status === tab.value).length;
             
             return (
               <button
@@ -158,7 +179,7 @@ export default function Suggestions() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            by {suggestion.createdBy.name} • {format(new Date(suggestion.createdAt), 'MMM d, yyyy')}
+                            by {suggestion.createdByProfile?.name || 'Unknown'} • {format(new Date(suggestion.created_at), 'MMM d, yyyy')}
                           </p>
                         </div>
                       </div>
@@ -173,6 +194,7 @@ export default function Suggestions() {
                           variant="success"
                           size="sm"
                           onClick={() => handleApprove(suggestion.id)}
+                          disabled={updateSuggestion.isPending}
                         >
                           <Check className="h-4 w-4" />
                           Approve
@@ -181,6 +203,7 @@ export default function Suggestions() {
                           variant="destructive"
                           size="sm"
                           onClick={() => handleReject(suggestion.id)}
+                          disabled={updateSuggestion.isPending}
                         >
                           <X className="h-4 w-4" />
                           Reject

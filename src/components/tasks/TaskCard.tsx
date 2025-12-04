@@ -1,19 +1,17 @@
-import { Task } from '@/types';
+import { TaskWithAssignees } from '@/hooks/useTasks';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import {
   Calendar,
   MapPin,
   Users,
-  MoreHorizontal,
   ChevronRight,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskWithAssignees;
   compact?: boolean;
 }
 
@@ -48,7 +46,7 @@ const categoryIcons: Record<string, string> = {
 };
 
 export function TaskCard({ task, compact = false }: TaskCardProps) {
-  const formatDueDate = (dateStr?: string) => {
+  const formatDueDate = (dateStr?: string | null) => {
     if (!dateStr) return null;
     const date = new Date(dateStr);
     if (isToday(date)) return 'Today';
@@ -56,7 +54,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
     return format(date, 'MMM d');
   };
 
-  const isOverdue = task.dueDate && isPast(new Date(task.dueDate)) && task.status !== 'completed';
+  const isOverdue = task.due_date && isPast(new Date(task.due_date)) && task.status !== 'completed';
 
   if (compact) {
     return (
@@ -76,12 +74,12 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
             </Badge>
           </div>
         </div>
-        {task.dueDate && (
+        {task.due_date && (
           <span className={cn(
             "text-sm",
             isOverdue ? "text-destructive font-medium" : "text-muted-foreground"
           )}>
-            {formatDueDate(task.dueDate)}
+            {formatDueDate(task.due_date)}
           </span>
         )}
         <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -121,13 +119,13 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
-        {task.dueDate && (
+        {task.due_date && (
           <div className={cn(
             "flex items-center gap-1.5",
             isOverdue && "text-destructive"
           )}>
             <Calendar className="h-4 w-4" />
-            <span>{formatDueDate(task.dueDate)}</span>
+            <span>{formatDueDate(task.due_date)}</span>
             {isOverdue && <span className="font-medium">(Overdue)</span>}
           </div>
         )}
@@ -137,7 +135,7 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
             <span>{task.location}</span>
           </div>
         )}
-        {task.assignedUsers.length > 0 && (
+        {task.assignedUsers && task.assignedUsers.length > 0 && (
           <div className="flex items-center gap-1.5">
             <Users className="h-4 w-4" />
             <span>{task.assignedUsers.map(u => u.name.split(' ')[0]).join(', ')}</span>

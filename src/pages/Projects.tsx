@@ -3,24 +3,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus,
   Search,
   FolderKanban,
   Calendar,
-  CheckSquare,
-  ShoppingCart,
   ChevronRight,
 } from 'lucide-react';
-import { mockProjects } from '@/data/mockData';
 import { Link, Navigate } from 'react-router-dom';
 import { format, isFuture, isPast } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { useProjects } from '@/hooks/useProjects';
 
 export default function Projects() {
   const { user } = useAuth();
+  const { data: projects = [], isLoading } = useProjects();
   const [search, setSearch] = useState('');
 
   // Only parents can access this page
@@ -28,13 +26,33 @@ export default function Projects() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const filteredProjects = mockProjects.filter(project => {
+  const filteredProjects = projects.filter(project => {
     return project.title.toLowerCase().includes(search.toLowerCase()) ||
       project.description?.toLowerCase().includes(search.toLowerCase());
   });
 
   const upcomingProjects = filteredProjects.filter(p => isFuture(new Date(p.date)));
   const pastProjects = filteredProjects.filter(p => isPast(new Date(p.date)));
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-32 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map(i => (
+              <Skeleton key={i} className="h-48 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -106,16 +124,6 @@ export default function Projects() {
                               {project.description}
                             </p>
                           )}
-                          <div className="flex items-center gap-4 text-sm">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <CheckSquare className="h-4 w-4" />
-                              <span>{project.tasks.length} tasks</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <ShoppingCart className="h-4 w-4" />
-                              <span>{project.shoppingLists.length} lists</span>
-                            </div>
-                          </div>
                         </CardContent>
                       </Card>
                     </Link>
@@ -157,16 +165,11 @@ export default function Projects() {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="flex items-center gap-4 text-sm">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <CheckSquare className="h-4 w-4" />
-                              <span>{project.tasks.length} tasks</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <ShoppingCart className="h-4 w-4" />
-                              <span>{project.shoppingLists.length} lists</span>
-                            </div>
-                          </div>
+                          {project.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {project.description}
+                            </p>
+                          )}
                         </CardContent>
                       </Card>
                     </Link>
