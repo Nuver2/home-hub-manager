@@ -53,52 +53,34 @@ export default function StaffForm() {
     setIsLoading(true);
 
     try {
-      // Create user in auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error('You must be logged in');
+        return;
+      }
+
+      const response = await supabase.functions.invoke('create-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          username: formData.username,
+          role: formData.role,
+          phone_number: formData.phone_number || null,
         },
       });
 
-      if (authError) {
-        throw authError;
+      if (response.error) {
+        throw new Error(response.error.message);
       }
 
-      if (authData.user) {
-        // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            name: formData.name,
-            username: formData.username,
-            phone_number: formData.phone_number || null,
-            status: 'active',
-          });
-
-        if (profileError) {
-          console.error('Profile error:', profileError);
-          throw profileError;
-        }
-
-        // Create role
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: authData.user.id,
-            role: formData.role,
-          });
-
-        if (roleError) {
-          console.error('Role error:', roleError);
-          throw roleError;
-        }
-
-        toast.success('Staff member added successfully');
-        navigate('/staff');
+      if (response.data?.error) {
+        throw new Error(response.data.error);
       }
+
+      toast.success('Staff member added successfully');
+      navigate('/staff');
     } catch (error: any) {
       console.error('Error creating staff:', error);
       toast.error(error.message || 'Failed to create staff member');

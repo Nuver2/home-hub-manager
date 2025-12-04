@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 // Pages
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+// Signup removed - only admins can create users via Staff form
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
@@ -82,11 +82,8 @@ function AppRoutes() {
           <Login />
         </PublicRoute>
       } />
-      <Route path="/signup" element={
-        <PublicRoute>
-          <Signup />
-        </PublicRoute>
-      } />
+      {/* Signup disabled - redirect to login */}
+      <Route path="/signup" element={<Navigate to="/login" replace />} />
 
       {/* Protected Routes */}
       <Route path="/dashboard" element={
