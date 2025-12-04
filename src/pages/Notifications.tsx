@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Bell,
   Check,
@@ -11,10 +11,10 @@ import {
   Lightbulb,
   MessageSquare,
 } from 'lucide-react';
-import { mockNotifications } from '@/data/mockData';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks/useNotifications';
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   task_assigned: CheckSquare,
@@ -27,20 +27,48 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { data: notifications = [], isLoading } = useNotifications();
+  const markAsRead = useMarkNotificationRead();
+  const markAllAsRead = useMarkAllNotificationsRead();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await markAsRead.mutateAsync(id);
+    } catch (error) {
+      toast.error('Failed to mark notification as read');
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    toast.success('All notifications marked as read');
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsRead.mutateAsync();
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      toast.error('Failed to mark all as read');
+    }
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-40 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map(i => (
+              <Skeleton key={i} className="h-20 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -59,7 +87,11 @@ export default function Notifications() {
             </p>
           </div>
           {unreadCount > 0 && (
-            <Button variant="outline" onClick={markAllAsRead}>
+            <Button 
+              variant="outline" 
+              onClick={handleMarkAllAsRead}
+              disabled={markAllAsRead.isPending}
+            >
               <CheckCheck className="h-4 w-4" />
               Mark all as read
             </Button>
@@ -100,7 +132,7 @@ export default function Notifications() {
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(notification.createdAt), 'MMM d, yyyy • h:mm a')}
+                      {format(new Date(notification.created_at), 'MMM d, yyyy • h:mm a')}
                     </p>
                   </div>
                   {!notification.read && (
@@ -108,7 +140,8 @@ export default function Notifications() {
                       variant="ghost"
                       size="icon"
                       className="shrink-0"
-                      onClick={() => markAsRead(notification.id)}
+                      onClick={() => handleMarkAsRead(notification.id)}
+                      disabled={markAsRead.isPending}
                     >
                       <Check className="h-4 w-4" />
                     </Button>

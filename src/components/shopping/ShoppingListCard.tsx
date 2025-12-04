@@ -1,4 +1,4 @@
-import { ShoppingList } from '@/types';
+import { ShoppingListWithRelations } from '@/hooks/useShoppingLists';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
@@ -12,7 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 
 interface ShoppingListCardProps {
-  list: ShoppingList;
+  list: ShoppingListWithRelations;
   compact?: boolean;
 }
 
@@ -44,7 +44,7 @@ const statusColors: Record<string, string> = {
 };
 
 export function ShoppingListCard({ list, compact = false }: ShoppingListCardProps) {
-  const formatDueDate = (dateStr?: string) => {
+  const formatDueDate = (dateStr?: string | null) => {
     if (!dateStr) return null;
     const date = new Date(dateStr);
     if (isToday(date)) return 'Today';
@@ -52,12 +52,13 @@ export function ShoppingListCard({ list, compact = false }: ShoppingListCardProp
     return format(date, 'MMM d');
   };
 
-  const isOverdue = list.dueDate && isPast(new Date(list.dueDate)) && list.status !== 'completed';
+  const isOverdue = list.due_date && isPast(new Date(list.due_date)) && list.status !== 'completed';
   
+  const items = list.items || [];
   const itemsProgress = {
-    total: list.items.length,
-    found: list.items.filter(i => i.status === 'found' || i.status === 'alternative').length,
-    notFound: list.items.filter(i => i.status === 'not_found').length,
+    total: items.length,
+    found: items.filter(i => i.status === 'found' || i.status === 'alternative').length,
+    notFound: items.filter(i => i.status === 'not_found').length,
   };
 
   if (compact) {
@@ -120,38 +121,42 @@ export function ShoppingListCard({ list, compact = false }: ShoppingListCardProp
       </div>
 
       {/* Progress Bar */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between text-sm mb-2">
-          <span className="text-muted-foreground">Items Progress</span>
-          <span className="font-medium">{itemsProgress.found}/{itemsProgress.total}</span>
+      {itemsProgress.total > 0 && (
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-sm mb-2">
+            <span className="text-muted-foreground">Items Progress</span>
+            <span className="font-medium">{itemsProgress.found}/{itemsProgress.total}</span>
+          </div>
+          <div className="h-2 bg-secondary rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-success transition-all duration-300"
+              style={{ width: `${(itemsProgress.found / itemsProgress.total) * 100}%` }}
+            />
+          </div>
         </div>
-        <div className="h-2 bg-secondary rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-success transition-all duration-300"
-            style={{ width: `${(itemsProgress.found / itemsProgress.total) * 100}%` }}
-          />
-        </div>
-      </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
-        {list.dueDate && (
+        {list.due_date && (
           <div className={cn(
             "flex items-center gap-1.5",
             isOverdue && "text-destructive"
           )}>
             <Calendar className="h-4 w-4" />
-            <span>{formatDueDate(list.dueDate)}</span>
+            <span>{formatDueDate(list.due_date)}</span>
             {isOverdue && <span className="font-medium">(Overdue)</span>}
           </div>
         )}
-        <div className="flex items-center gap-1.5">
-          <User className="h-4 w-4" />
-          <span>By {list.createdBy.name.split(' ')[0]}</span>
-        </div>
-        {list.assignedTo && (
+        {list.createdByProfile && (
+          <div className="flex items-center gap-1.5">
+            <User className="h-4 w-4" />
+            <span>By {list.createdByProfile.name.split(' ')[0]}</span>
+          </div>
+        )}
+        {list.assignedToProfile && (
           <div className="flex items-center gap-1.5">
             <Package className="h-4 w-4" />
-            <span>Assigned to {list.assignedTo.name.split(' ')[0]}</span>
+            <span>Assigned to {list.assignedToProfile.name.split(' ')[0]}</span>
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import { StaffCard } from '@/components/staff/StaffCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -17,12 +18,13 @@ import {
   Search,
   Users,
 } from 'lucide-react';
-import { mockUsers } from '@/data/mockData';
 import { Link, Navigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useStaff } from '@/hooks/useStaff';
 
 export default function Staff() {
   const { user } = useAuth();
+  const { data: staffMembers = [], isLoading } = useStaff();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -31,8 +33,6 @@ export default function Staff() {
   if (user?.role !== 'parent') {
     return <Navigate to="/dashboard" replace />;
   }
-
-  const staffMembers = mockUsers.filter(u => u.role !== 'parent');
 
   const filteredStaff = staffMembers.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -50,6 +50,26 @@ export default function Staff() {
     { value: 'cleaner', label: 'Cleaners' },
     { value: 'other', label: 'Other' },
   ];
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Skeleton key={i} className="h-40 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

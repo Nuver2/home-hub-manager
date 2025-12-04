@@ -5,50 +5,74 @@ import { TaskCard } from '@/components/tasks/TaskCard';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   CheckSquare,
   ShoppingCart,
   Users,
   Lightbulb,
   Clock,
-  TrendingUp,
   Plus,
   ArrowRight,
   CalendarDays,
 } from 'lucide-react';
-import { mockTasks, mockShoppingLists, mockSuggestions, getDashboardStats, mockUsers } from '@/data/mockData';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { useTasks } from '@/hooks/useTasks';
+import { useShoppingLists } from '@/hooks/useShoppingLists';
+import { useSuggestions } from '@/hooks/useSuggestions';
+import { useStaff } from '@/hooks/useStaff';
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const stats = getDashboardStats(user?.role || '');
+  const { data: tasks = [], isLoading: tasksLoading } = useTasks();
+  const { data: shoppingLists = [], isLoading: listsLoading } = useShoppingLists();
+  const { data: suggestions = [], isLoading: suggestionsLoading } = useSuggestions();
+  const { data: staff = [], isLoading: staffLoading } = useStaff();
+
   const isParent = user?.role === 'parent';
+  const isLoading = tasksLoading || listsLoading || suggestionsLoading || staffLoading;
 
-  // Filter tasks for current user
-  const userTasks = isParent 
-    ? mockTasks 
-    : mockTasks.filter(t => t.assignedUsers.some(u => u.id === user?.id) || (user?.role && t.assignedRoles?.includes(user.role)));
+  // Calculate stats
+  const stats = {
+    totalTasks: tasks.length,
+    completedTasks: tasks.filter(t => t.status === 'completed').length,
+    inProgressTasks: tasks.filter(t => t.status === 'in_progress').length,
+    pendingTasks: tasks.filter(t => t.status === 'to_do').length,
+    totalShoppingLists: shoppingLists.length,
+    activeShoppingLists: shoppingLists.filter(l => l.status !== 'completed' && l.status !== 'draft').length,
+    totalStaff: staff.length,
+  };
 
-  const upcomingTasks = userTasks
+  const upcomingTasks = tasks
     .filter(t => t.status !== 'completed')
     .slice(0, 3);
 
-  // Filter shopping lists for current user
-  const userShoppingLists = isParent
-    ? mockShoppingLists
-    : user?.role === 'chef' || user?.role === 'driver'
-      ? mockShoppingLists.filter(l => 
-          l.createdBy.id === user?.id || 
-          l.assignedTo?.id === user?.id
-        )
-      : [];
-
-  const activeShoppingLists = userShoppingLists
+  const activeShoppingLists = shoppingLists
     .filter(l => l.status !== 'completed' && l.status !== 'draft')
     .slice(0, 2);
 
-  const pendingSuggestions = mockSuggestions.filter(s => s.status === 'pending');
+  const pendingSuggestions = suggestions.filter(s => s.status === 'pending');
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 space-y-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Skeleton className="h-8 w-64 mb-2" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className="h-32 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -57,7 +81,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="animate-slide-up">
             <h1 className="text-2xl lg:text-3xl font-bold">
-              Welcome back, {user?.name.split(' ')[0]}!
+              Welcome back, {user?.name?.split(' ')[0] || 'User'}!
             </h1>
             <p className="text-muted-foreground mt-1">
               {format(new Date(), 'EEEE, MMMM d, yyyy')}
@@ -79,7 +103,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Tasks"
-            value={isParent ? stats.totalTasks : userTasks.length}
+            value={stats.totalTasks}
             subtitle={`${stats.completedTasks} completed`}
             icon={CheckSquare}
             variant="default"
@@ -93,7 +117,7 @@ export default function Dashboard() {
           {(isParent || user?.role === 'chef' || user?.role === 'driver') && (
             <StatCard
               title="Shopping Lists"
-              value={isParent ? stats.totalShoppingLists : userShoppingLists.length}
+              value={stats.totalShoppingLists}
               subtitle={`${stats.activeShoppingLists} active`}
               icon={ShoppingCart}
               variant="accent"
@@ -110,7 +134,7 @@ export default function Dashboard() {
           {!isParent && (
             <StatCard
               title="Pending"
-              value={userTasks.filter(t => t.status === 'to_do').length}
+              value={stats.pendingTasks}
               icon={CalendarDays}
               variant="warning"
             />
@@ -206,7 +230,7 @@ export default function Dashboard() {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{suggestion.title}</p>
                           <p className="text-sm text-muted-foreground truncate">
-                            by {suggestion.createdBy.name}
+                            by {suggestion.createdByProfile?.name || 'Unknown'}
                           </p>
                         </div>
                       </div>
