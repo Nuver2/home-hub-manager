@@ -14,16 +14,466 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          id: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          attachments: string[] | null
+          content: string
+          created_at: string
+          id: string
+          shopping_list_id: string | null
+          task_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          content: string
+          created_at?: string
+          id?: string
+          shopping_list_id?: string | null
+          task_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attachments?: string[] | null
+          content?: string
+          created_at?: string
+          id?: string
+          shopping_list_id?: string | null
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_shopping_list_id_fkey"
+            columns: ["shopping_list_id"]
+            isOneToOne: false
+            referencedRelation: "shopping_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          related_id: string | null
+          related_type: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          related_id?: string | null
+          related_type?: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          related_id?: string | null
+          related_type?: string | null
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          phone_number: string | null
+          profile_picture: string | null
+          status: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          phone_number?: string | null
+          profile_picture?: string | null
+          status?: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          phone_number?: string | null
+          profile_picture?: string | null
+          status?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shopping_list_items: {
+        Row: {
+          chef_confirmation: Database["public"]["Enums"]["chef_confirmation"]
+          created_at: string
+          details: string | null
+          driver_attachment: string | null
+          driver_comment: string | null
+          id: string
+          name: string
+          quantity: number
+          shopping_list_id: string
+          status: Database["public"]["Enums"]["item_status"]
+          updated_at: string
+        }
+        Insert: {
+          chef_confirmation?: Database["public"]["Enums"]["chef_confirmation"]
+          created_at?: string
+          details?: string | null
+          driver_attachment?: string | null
+          driver_comment?: string | null
+          id?: string
+          name: string
+          quantity?: number
+          shopping_list_id: string
+          status?: Database["public"]["Enums"]["item_status"]
+          updated_at?: string
+        }
+        Update: {
+          chef_confirmation?: Database["public"]["Enums"]["chef_confirmation"]
+          created_at?: string
+          details?: string | null
+          driver_attachment?: string | null
+          driver_comment?: string | null
+          id?: string
+          name?: string
+          quantity?: number
+          shopping_list_id?: string
+          status?: Database["public"]["Enums"]["item_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_items_shopping_list_id_fkey"
+            columns: ["shopping_list_id"]
+            isOneToOne: false
+            referencedRelation: "shopping_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopping_lists: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          priority: Database["public"]["Enums"]["task_priority"]
+          project_id: string | null
+          status: Database["public"]["Enums"]["shopping_list_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["shopping_list_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["shopping_list_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_lists_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestions: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          status: Database["public"]["Enums"]["suggestion_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          status?: Database["public"]["Enums"]["suggestion_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          status?: Database["public"]["Enums"]["suggestion_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      task_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_assignments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          assigned_roles: Database["public"]["Enums"]["app_role"][] | null
+          attachments: string[] | null
+          category: Database["public"]["Enums"]["task_category"]
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          location: string | null
+          priority: Database["public"]["Enums"]["task_priority"]
+          project_id: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_roles?: Database["public"]["Enums"]["app_role"][] | null
+          attachments?: string[] | null
+          category?: Database["public"]["Enums"]["task_category"]
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          location?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_roles?: Database["public"]["Enums"]["app_role"][] | null
+          attachments?: string[] | null
+          category?: Database["public"]["Enums"]["task_category"]
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          location?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "parent" | "driver" | "chef" | "cleaner" | "other"
+      chef_confirmation: "pending" | "ok" | "not_ok"
+      item_status: "pending" | "found" | "not_found" | "alternative"
+      notification_type:
+        | "task_assigned"
+        | "task_status_changed"
+        | "shopping_list_assigned"
+        | "shopping_list_status_changed"
+        | "suggestion_approved"
+        | "suggestion_rejected"
+        | "new_comment"
+      shopping_list_status:
+        | "draft"
+        | "assigned"
+        | "in_progress"
+        | "delivered"
+        | "waiting_confirmation"
+        | "completed"
+        | "returned_for_fix"
+      suggestion_status: "pending" | "approved" | "rejected"
+      task_category:
+        | "cleaning"
+        | "kitchen"
+        | "driving"
+        | "shopping"
+        | "maintenance"
+        | "other"
+      task_priority: "low" | "medium" | "high" | "urgent"
+      task_status: "to_do" | "in_progress" | "completed" | "on_hold"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +600,39 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["parent", "driver", "chef", "cleaner", "other"],
+      chef_confirmation: ["pending", "ok", "not_ok"],
+      item_status: ["pending", "found", "not_found", "alternative"],
+      notification_type: [
+        "task_assigned",
+        "task_status_changed",
+        "shopping_list_assigned",
+        "shopping_list_status_changed",
+        "suggestion_approved",
+        "suggestion_rejected",
+        "new_comment",
+      ],
+      shopping_list_status: [
+        "draft",
+        "assigned",
+        "in_progress",
+        "delivered",
+        "waiting_confirmation",
+        "completed",
+        "returned_for_fix",
+      ],
+      suggestion_status: ["pending", "approved", "rejected"],
+      task_category: [
+        "cleaning",
+        "kitchen",
+        "driving",
+        "shopping",
+        "maintenance",
+        "other",
+      ],
+      task_priority: ["low", "medium", "high", "urgent"],
+      task_status: ["to_do", "in_progress", "completed", "on_hold"],
+    },
   },
 } as const
