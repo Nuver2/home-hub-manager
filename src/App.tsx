@@ -10,10 +10,18 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
+import TaskDetail from "./pages/TaskDetail";
+import TaskForm from "./pages/TaskForm";
 import ShoppingLists from "./pages/ShoppingLists";
+import ShoppingListDetail from "./pages/ShoppingListDetail";
+import ShoppingListForm from "./pages/ShoppingListForm";
 import Staff from "./pages/Staff";
+import StaffForm from "./pages/StaffForm";
 import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
+import ProjectForm from "./pages/ProjectForm";
 import Suggestions from "./pages/Suggestions";
+import SuggestionForm from "./pages/SuggestionForm";
 import ActivityLog from "./pages/ActivityLog";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
@@ -86,41 +94,112 @@ function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
+      
+      {/* Tasks */}
       <Route path="/tasks" element={
         <ProtectedRoute>
           <Tasks />
         </ProtectedRoute>
       } />
+      <Route path="/tasks/new" element={
+        <ProtectedRoute>
+          <TaskForm />
+        </ProtectedRoute>
+      } />
+      <Route path="/tasks/:id" element={
+        <ProtectedRoute>
+          <TaskDetail />
+        </ProtectedRoute>
+      } />
+      <Route path="/tasks/:id/edit" element={
+        <ProtectedRoute>
+          <TaskForm />
+        </ProtectedRoute>
+      } />
+
+      {/* Shopping Lists */}
       <Route path="/shopping-lists" element={
         <ProtectedRoute>
           <ShoppingLists />
         </ProtectedRoute>
       } />
+      <Route path="/shopping-lists/new" element={
+        <ProtectedRoute>
+          <ShoppingListForm />
+        </ProtectedRoute>
+      } />
+      <Route path="/shopping-lists/:id" element={
+        <ProtectedRoute>
+          <ShoppingListDetail />
+        </ProtectedRoute>
+      } />
+      <Route path="/shopping-lists/:id/edit" element={
+        <ProtectedRoute>
+          <ShoppingListForm />
+        </ProtectedRoute>
+      } />
+
+      {/* Staff */}
       <Route path="/staff" element={
         <ProtectedRoute>
           <Staff />
         </ProtectedRoute>
       } />
+      <Route path="/staff/new" element={
+        <ProtectedRoute>
+          <StaffForm />
+        </ProtectedRoute>
+      } />
+
+      {/* Projects */}
       <Route path="/projects" element={
         <ProtectedRoute>
           <Projects />
         </ProtectedRoute>
       } />
+      <Route path="/projects/new" element={
+        <ProtectedRoute>
+          <ProjectForm />
+        </ProtectedRoute>
+      } />
+      <Route path="/projects/:id" element={
+        <ProtectedRoute>
+          <ProjectDetail />
+        </ProtectedRoute>
+      } />
+      <Route path="/projects/:id/edit" element={
+        <ProtectedRoute>
+          <ProjectForm />
+        </ProtectedRoute>
+      } />
+
+      {/* Suggestions */}
       <Route path="/suggestions" element={
         <ProtectedRoute>
           <Suggestions />
         </ProtectedRoute>
       } />
+      <Route path="/suggestions/new" element={
+        <ProtectedRoute>
+          <SuggestionForm />
+        </ProtectedRoute>
+      } />
+
+      {/* Activity Log */}
       <Route path="/activity" element={
         <ProtectedRoute>
           <ActivityLog />
         </ProtectedRoute>
       } />
+
+      {/* Notifications */}
       <Route path="/notifications" element={
         <ProtectedRoute>
           <Notifications />
         </ProtectedRoute>
       } />
+
+      {/* Settings */}
       <Route path="/settings" element={
         <ProtectedRoute>
           <Settings />
