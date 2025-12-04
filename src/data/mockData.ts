@@ -1,0 +1,337 @@
+import { User, Task, ShoppingList, Suggestion, Notification, Project, ActivityLog } from '@/types';
+
+// Mock Users
+export const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'Sarah Johnson',
+    username: 'sarah.parent',
+    role: 'parent',
+    status: 'active',
+    phoneNumber: '+1 555-0100',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: '2',
+    name: 'Michael Chen',
+    username: 'michael.driver',
+    role: 'driver',
+    status: 'active',
+    phoneNumber: '+1 555-0101',
+    createdAt: '2024-01-15T00:00:00Z',
+    updatedAt: '2024-01-15T00:00:00Z',
+  },
+  {
+    id: '3',
+    name: 'Elena Rodriguez',
+    username: 'elena.chef',
+    role: 'chef',
+    status: 'active',
+    phoneNumber: '+1 555-0102',
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z',
+  },
+  {
+    id: '4',
+    name: 'James Wilson',
+    username: 'james.cleaner',
+    role: 'cleaner',
+    status: 'active',
+    phoneNumber: '+1 555-0103',
+    createdAt: '2024-02-15T00:00:00Z',
+    updatedAt: '2024-02-15T00:00:00Z',
+  },
+  {
+    id: '5',
+    name: 'Anna Smith',
+    username: 'anna.other',
+    role: 'other',
+    status: 'inactive',
+    phoneNumber: '+1 555-0104',
+    createdAt: '2024-03-01T00:00:00Z',
+    updatedAt: '2024-03-01T00:00:00Z',
+  },
+];
+
+// Mock Tasks
+export const mockTasks: Task[] = [
+  {
+    id: '1',
+    title: 'Deep clean living room',
+    description: 'Complete deep cleaning including carpets, windows, and furniture.',
+    priority: 'high',
+    status: 'in_progress',
+    category: 'cleaning',
+    dueDate: '2024-12-06T17:00:00Z',
+    location: 'Living Room',
+    assignedUsers: [mockUsers[3]],
+    createdAt: '2024-12-01T10:00:00Z',
+    updatedAt: '2024-12-04T09:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Prepare dinner for guests',
+    description: 'Cook a 5-course meal for 8 guests. Menu includes appetizers, soup, main course, dessert.',
+    priority: 'urgent',
+    status: 'to_do',
+    category: 'kitchen',
+    dueDate: '2024-12-05T18:00:00Z',
+    location: 'Kitchen',
+    assignedUsers: [mockUsers[2]],
+    createdAt: '2024-12-02T08:00:00Z',
+    updatedAt: '2024-12-02T08:00:00Z',
+  },
+  {
+    id: '3',
+    title: 'Airport pickup',
+    description: 'Pick up Mr. Anderson from JFK Airport, Terminal 4.',
+    priority: 'high',
+    status: 'to_do',
+    category: 'driving',
+    dueDate: '2024-12-05T14:30:00Z',
+    location: 'JFK Airport',
+    assignedUsers: [mockUsers[1]],
+    createdAt: '2024-12-03T11:00:00Z',
+    updatedAt: '2024-12-03T11:00:00Z',
+  },
+  {
+    id: '4',
+    title: 'Fix garden irrigation',
+    description: 'Repair broken sprinkler heads in the front garden area.',
+    priority: 'medium',
+    status: 'on_hold',
+    category: 'maintenance',
+    dueDate: '2024-12-10T12:00:00Z',
+    location: 'Front Garden',
+    assignedUsers: [mockUsers[4]],
+    createdAt: '2024-12-01T14:00:00Z',
+    updatedAt: '2024-12-03T16:00:00Z',
+  },
+  {
+    id: '5',
+    title: 'Organize pantry',
+    description: 'Sort and organize all items in the pantry. Check expiration dates.',
+    priority: 'low',
+    status: 'completed',
+    category: 'kitchen',
+    dueDate: '2024-12-03T15:00:00Z',
+    location: 'Pantry',
+    assignedUsers: [mockUsers[2], mockUsers[3]],
+    createdAt: '2024-11-28T09:00:00Z',
+    updatedAt: '2024-12-03T14:30:00Z',
+  },
+  {
+    id: '6',
+    title: 'Weekly grocery shopping',
+    description: 'Purchase weekly groceries from the shopping list.',
+    priority: 'medium',
+    status: 'in_progress',
+    category: 'shopping',
+    dueDate: '2024-12-04T16:00:00Z',
+    assignedUsers: [mockUsers[1]],
+    createdAt: '2024-12-04T08:00:00Z',
+    updatedAt: '2024-12-04T10:00:00Z',
+  },
+];
+
+// Mock Shopping Lists
+export const mockShoppingLists: ShoppingList[] = [
+  {
+    id: '1',
+    title: 'Weekly Groceries',
+    createdBy: mockUsers[2],
+    assignedTo: mockUsers[1],
+    priority: 'medium',
+    dueDate: '2024-12-05T12:00:00Z',
+    status: 'in_progress',
+    notes: 'Please check organic section first',
+    items: [
+      { id: '1', name: 'Organic Milk', quantity: 2, details: '1 gallon each', status: 'found', chefConfirmation: 'pending' },
+      { id: '2', name: 'Free-range Eggs', quantity: 24, details: 'Large size', status: 'found', chefConfirmation: 'pending' },
+      { id: '3', name: 'Sourdough Bread', quantity: 2, status: 'pending', chefConfirmation: 'pending' },
+      { id: '4', name: 'Fresh Salmon', quantity: 4, details: 'Fillets, about 6oz each', status: 'not_found', driverComment: 'Out of stock, will check another store', chefConfirmation: 'pending' },
+      { id: '5', name: 'Avocados', quantity: 6, details: 'Ripe ones', status: 'alternative', driverComment: 'Got organic instead', chefConfirmation: 'pending' },
+    ],
+    createdAt: '2024-12-03T09:00:00Z',
+    updatedAt: '2024-12-04T11:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Dinner Party Supplies',
+    createdBy: mockUsers[2],
+    assignedTo: mockUsers[1],
+    priority: 'urgent',
+    dueDate: '2024-12-05T14:00:00Z',
+    status: 'assigned',
+    notes: 'For Saturday dinner party - 8 guests',
+    items: [
+      { id: '1', name: 'Beef Tenderloin', quantity: 3, details: '2 lbs each', status: 'pending', chefConfirmation: 'pending' },
+      { id: '2', name: 'Truffle Oil', quantity: 1, details: 'Black truffle, 100ml', status: 'pending', chefConfirmation: 'pending' },
+      { id: '3', name: 'Champagne', quantity: 4, details: 'Moët or similar', status: 'pending', chefConfirmation: 'pending' },
+      { id: '4', name: 'Fresh Herbs Bundle', quantity: 2, details: 'Thyme, rosemary, sage', status: 'pending', chefConfirmation: 'pending' },
+    ],
+    createdAt: '2024-12-04T07:00:00Z',
+    updatedAt: '2024-12-04T07:00:00Z',
+  },
+  {
+    id: '3',
+    title: 'Cleaning Supplies',
+    createdBy: mockUsers[0],
+    priority: 'low',
+    dueDate: '2024-12-08T17:00:00Z',
+    status: 'draft',
+    items: [
+      { id: '1', name: 'All-purpose Cleaner', quantity: 3, status: 'pending', chefConfirmation: 'pending' },
+      { id: '2', name: 'Microfiber Cloths', quantity: 10, status: 'pending', chefConfirmation: 'pending' },
+      { id: '3', name: 'Floor Polish', quantity: 2, status: 'pending', chefConfirmation: 'pending' },
+    ],
+    createdAt: '2024-12-04T10:00:00Z',
+    updatedAt: '2024-12-04T10:00:00Z',
+  },
+];
+
+// Mock Suggestions
+export const mockSuggestions: Suggestion[] = [
+  {
+    id: '1',
+    title: 'Install smart home system',
+    description: 'Consider installing smart lights and thermostats for better energy efficiency and convenience.',
+    createdBy: mockUsers[1],
+    status: 'pending',
+    createdAt: '2024-12-02T14:00:00Z',
+    updatedAt: '2024-12-02T14:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Meal prep service',
+    description: 'Weekly meal prep on Sundays could save time during busy weekdays.',
+    createdBy: mockUsers[2],
+    status: 'approved',
+    createdAt: '2024-11-28T10:00:00Z',
+    updatedAt: '2024-12-01T09:00:00Z',
+  },
+  {
+    id: '3',
+    title: 'New vacuum cleaner',
+    description: 'Current vacuum is losing suction. Recommend Dyson V15 for better cleaning.',
+    createdBy: mockUsers[3],
+    status: 'rejected',
+    createdAt: '2024-11-25T11:00:00Z',
+    updatedAt: '2024-11-26T15:00:00Z',
+  },
+];
+
+// Mock Notifications
+export const mockNotifications: Notification[] = [
+  {
+    id: '1',
+    userId: '1',
+    type: 'task_assigned',
+    message: 'New task "Deep clean living room" has been assigned to James',
+    relatedId: '1',
+    relatedType: 'task',
+    read: false,
+    createdAt: '2024-12-04T09:00:00Z',
+  },
+  {
+    id: '2',
+    userId: '1',
+    type: 'shopping_list_status_changed',
+    message: 'Shopping list "Weekly Groceries" is now in progress',
+    relatedId: '1',
+    relatedType: 'shopping_list',
+    read: false,
+    createdAt: '2024-12-04T10:30:00Z',
+  },
+  {
+    id: '3',
+    userId: '1',
+    type: 'suggestion_approved',
+    message: 'Your suggestion "Meal prep service" has been approved',
+    relatedId: '2',
+    relatedType: 'suggestion',
+    read: true,
+    createdAt: '2024-12-01T09:00:00Z',
+  },
+];
+
+// Mock Projects
+export const mockProjects: Project[] = [
+  {
+    id: '1',
+    title: 'Saturday Dinner Party',
+    description: 'Hosting 8 guests for an elegant dinner party.',
+    date: '2024-12-07T18:00:00Z',
+    tasks: [mockTasks[1]],
+    shoppingLists: [mockShoppingLists[1]],
+    createdAt: '2024-12-01T08:00:00Z',
+    updatedAt: '2024-12-04T07:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Holiday Preparations',
+    description: 'Get the house ready for the holiday season.',
+    date: '2024-12-20T00:00:00Z',
+    tasks: [mockTasks[0], mockTasks[4]],
+    shoppingLists: [mockShoppingLists[2]],
+    createdAt: '2024-11-25T10:00:00Z',
+    updatedAt: '2024-12-03T14:30:00Z',
+  },
+];
+
+// Mock Activity Log
+export const mockActivityLog: ActivityLog[] = [
+  {
+    id: '1',
+    user: mockUsers[0],
+    action: 'created',
+    targetType: 'task',
+    targetId: '1',
+    details: 'Created task "Deep clean living room"',
+    createdAt: '2024-12-01T10:00:00Z',
+  },
+  {
+    id: '2',
+    user: mockUsers[3],
+    action: 'status_changed',
+    targetType: 'task',
+    targetId: '1',
+    details: 'Changed status from "to_do" to "in_progress"',
+    createdAt: '2024-12-04T09:00:00Z',
+  },
+  {
+    id: '3',
+    user: mockUsers[2],
+    action: 'created',
+    targetType: 'shopping_list',
+    targetId: '1',
+    details: 'Created shopping list "Weekly Groceries"',
+    createdAt: '2024-12-03T09:00:00Z',
+  },
+  {
+    id: '4',
+    user: mockUsers[1],
+    action: 'updated',
+    targetType: 'shopping_list',
+    targetId: '1',
+    details: 'Updated item status for "Fresh Salmon" to "not_found"',
+    createdAt: '2024-12-04T11:00:00Z',
+  },
+];
+
+// Dashboard Stats
+export const getDashboardStats = (role: string) => {
+  const baseStats = {
+    totalTasks: mockTasks.length,
+    completedTasks: mockTasks.filter(t => t.status === 'completed').length,
+    pendingTasks: mockTasks.filter(t => t.status === 'to_do').length,
+    inProgressTasks: mockTasks.filter(t => t.status === 'in_progress').length,
+    totalShoppingLists: mockShoppingLists.length,
+    activeShoppingLists: mockShoppingLists.filter(l => l.status !== 'completed' && l.status !== 'draft').length,
+    pendingSuggestions: mockSuggestions.filter(s => s.status === 'pending').length,
+    totalStaff: mockUsers.filter(u => u.role !== 'parent').length,
+  };
+
+  return baseStats;
+};
