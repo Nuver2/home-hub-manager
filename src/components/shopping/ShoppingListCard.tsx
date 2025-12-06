@@ -65,14 +65,14 @@ export function ShoppingListCard({ list, compact = false }: ShoppingListCardProp
     return (
       <Link
         to={`/shopping-lists/${list.id}`}
-        className="flex items-center gap-4 rounded-lg border bg-card p-4 transition-all duration-200 hover:shadow-medium hover:-translate-y-0.5 group"
+        className="flex items-center gap-4 rounded-xl border bg-card p-4 card-interactive group touch-feedback"
       >
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent shrink-0 group-hover:scale-110 transition-transform">
           <ShoppingCart className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-medium truncate group-hover:text-accent transition-colors">{list.title}</p>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1.5">
             <Badge variant={priorityVariants[list.priority]} className="text-xs">
               {list.priority}
             </Badge>
@@ -81,10 +81,10 @@ export function ShoppingListCard({ list, compact = false }: ShoppingListCardProp
             </span>
           </div>
         </div>
-        <Badge className={cn("text-xs", statusColors[list.status])}>
+        <Badge className={cn("text-xs shrink-0", statusColors[list.status])}>
           {statusLabels[list.status]}
         </Badge>
-        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
       </Link>
     );
   }
@@ -92,7 +92,7 @@ export function ShoppingListCard({ list, compact = false }: ShoppingListCardProp
   return (
     <Link
       to={`/shopping-lists/${list.id}`}
-      className="block rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-medium hover:-translate-y-0.5 group animate-fade-in"
+      className="block rounded-xl border bg-card p-5 card-interactive group animate-fade-in touch-feedback"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 flex-1 min-w-0">

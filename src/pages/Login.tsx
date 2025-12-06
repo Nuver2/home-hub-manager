@@ -37,21 +37,29 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background p-4">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/30 to-background p-4 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo & Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-4 animate-slide-up">
           <div className="flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg hover:scale-105 transition-transform duration-300 hover:shadow-glow">
               <Home className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">HomeHub</h1>
-          <p className="text-muted-foreground">Household Staff Management</p>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">HomeHub</h1>
+            <p className="text-muted-foreground mt-1">Household Staff Management</p>
+          </div>
         </div>
 
         {/* Login Card */}
-        <Card className="border-0 shadow-medium">
+        <Card className="border-0 shadow-medium animate-slide-up" style={{ animationDelay: '100ms' }}>
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl">Sign in</CardTitle>
             <CardDescription>
@@ -61,7 +69,7 @@ export default function Login() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive animate-fade-in">
+                <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive animate-shake">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -77,6 +85,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
+                  className="h-12"
                 />
               </div>
 
@@ -90,12 +99,13 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
+                  className="h-12"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full h-12 text-base font-medium"
                 variant="accent"
                 size="lg"
                 disabled={isLoading}
@@ -105,11 +115,16 @@ export default function Login() {
               </Button>
             </form>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
+            <p className="mt-6 text-center text-sm text-muted-foreground">
               Contact your administrator if you need an account
             </p>
           </CardContent>
         </Card>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-muted-foreground/60 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          Secure login powered by HomeHub
+        </p>
       </div>
     </div>
   );

@@ -60,12 +60,14 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
     return (
       <Link
         to={`/tasks/${task.id}`}
-        className="flex items-center gap-4 rounded-lg border bg-card p-4 transition-all duration-200 hover:shadow-medium hover:-translate-y-0.5 group"
+        className="flex items-center gap-4 rounded-xl border bg-card p-4 card-interactive group touch-feedback"
       >
-        <span className="text-xl">{categoryIcons[task.category]}</span>
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/80 text-xl shrink-0 group-hover:scale-110 transition-transform">
+          {categoryIcons[task.category]}
+        </div>
         <div className="flex-1 min-w-0">
           <p className="font-medium truncate group-hover:text-accent transition-colors">{task.title}</p>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1.5">
             <Badge variant={priorityVariants[task.priority]} className="text-xs">
               {task.priority}
             </Badge>
@@ -75,14 +77,15 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
           </div>
         </div>
         {task.due_date && (
-          <span className={cn(
-            "text-sm",
-            isOverdue ? "text-destructive font-medium" : "text-muted-foreground"
+          <div className={cn(
+            "text-right shrink-0",
+            isOverdue ? "text-destructive" : "text-muted-foreground"
           )}>
-            {formatDueDate(task.due_date)}
-          </span>
+            <span className="text-sm font-medium">{formatDueDate(task.due_date)}</span>
+            {isOverdue && <p className="text-[10px] uppercase tracking-wide">Overdue</p>}
+          </div>
         )}
-        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
       </Link>
     );
   }

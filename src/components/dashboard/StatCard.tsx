@@ -43,16 +43,16 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-xl border p-6 transition-all duration-200 hover-lift animate-fade-in",
+        "rounded-xl border p-5 transition-all duration-300 hover-lift hover-glow animate-fade-in group touch-feedback",
         variantStyles[variant],
         className
       )}
     >
       <div className="flex items-start justify-between">
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <div className="flex items-baseline gap-2">
-            <p className="text-3xl font-bold tracking-tight">{value}</p>
+            <p className="text-3xl font-bold tracking-tight group-hover:scale-105 transition-transform origin-left">{value}</p>
             {trend && (
               <span
                 className={cn(
@@ -65,11 +65,14 @@ export function StatCard({
             )}
           </div>
           {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
           )}
         </div>
-        <div className={cn("rounded-lg p-3", iconStyles[variant])}>
-          <Icon className="h-6 w-6" />
+        <div className={cn(
+          "rounded-xl p-3 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3",
+          iconStyles[variant]
+        )}>
+          <Icon className="h-5 w-5" />
         </div>
       </div>
     </div>
