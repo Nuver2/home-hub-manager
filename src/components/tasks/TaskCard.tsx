@@ -60,18 +60,18 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
     return (
       <Link
         to={`/tasks/${task.id}`}
-        className="flex items-center gap-4 rounded-xl border bg-card p-4 card-interactive group touch-feedback"
+        className="flex items-center gap-3 rounded-xl border bg-card p-3 active:scale-[0.98] transition-transform duration-75 group"
       >
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/80 text-xl shrink-0 group-hover:scale-110 transition-transform">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/80 text-lg shrink-0">
           {categoryIcons[task.category]}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium truncate group-hover:text-accent transition-colors">{task.title}</p>
-          <div className="flex items-center gap-2 mt-1.5">
-            <Badge variant={priorityVariants[task.priority]} className="text-xs">
+          <p className="font-medium truncate text-sm">{task.title}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <Badge variant={priorityVariants[task.priority]} className="text-[10px] px-2 py-0">
               {task.priority}
             </Badge>
-            <Badge variant={statusVariants[task.status]} className="text-xs">
+            <Badge variant={statusVariants[task.status]} className="text-[10px] px-2 py-0">
               {statusLabels[task.status]}
             </Badge>
           </div>
@@ -81,11 +81,10 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
             "text-right shrink-0",
             isOverdue ? "text-destructive" : "text-muted-foreground"
           )}>
-            <span className="text-sm font-medium">{formatDueDate(task.due_date)}</span>
-            {isOverdue && <p className="text-[10px] uppercase tracking-wide">Overdue</p>}
+            <span className="text-xs font-medium">{formatDueDate(task.due_date)}</span>
           </div>
         )}
-        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
       </Link>
     );
   }
@@ -93,55 +92,52 @@ export function TaskCard({ task, compact = false }: TaskCardProps) {
   return (
     <Link
       to={`/tasks/${task.id}`}
-      className="block rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-medium hover:-translate-y-0.5 group animate-fade-in"
+      className="block rounded-xl border bg-card p-4 active:scale-[0.98] transition-transform duration-75 group"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4 flex-1 min-w-0">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl shrink-0">
-            {categoryIcons[task.category]}
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-xl shrink-0">
+          {categoryIcons[task.category]}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Badge variant={priorityVariants[task.priority]} className="text-[10px] px-2 py-0">
+              {task.priority}
+            </Badge>
+            <Badge variant={statusVariants[task.status]} className="text-[10px] px-2 py-0">
+              {statusLabels[task.status]}
+            </Badge>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant={priorityVariants[task.priority]}>
-                {task.priority}
-              </Badge>
-              <Badge variant={statusVariants[task.status]}>
-                {statusLabels[task.status]}
-              </Badge>
-            </div>
-            <h3 className="font-semibold text-lg truncate group-hover:text-accent transition-colors">
-              {task.title}
-            </h3>
-            {task.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {task.description}
-              </p>
-            )}
-          </div>
+          <h3 className="font-semibold text-base truncate">
+            {task.title}
+          </h3>
+          {task.description && (
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
+              {task.description}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
         {task.due_date && (
           <div className={cn(
-            "flex items-center gap-1.5",
+            "flex items-center gap-1",
             isOverdue && "text-destructive"
           )}>
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-3.5 w-3.5" />
             <span>{formatDueDate(task.due_date)}</span>
-            {isOverdue && <span className="font-medium">(Overdue)</span>}
           </div>
         )}
         {task.location && (
-          <div className="flex items-center gap-1.5">
-            <MapPin className="h-4 w-4" />
-            <span>{task.location}</span>
+          <div className="flex items-center gap-1">
+            <MapPin className="h-3.5 w-3.5" />
+            <span className="truncate max-w-[100px]">{task.location}</span>
           </div>
         )}
         {task.assignedUsers && task.assignedUsers.length > 0 && (
-          <div className="flex items-center gap-1.5">
-            <Users className="h-4 w-4" />
-            <span>{task.assignedUsers.map(u => u.name.split(' ')[0]).join(', ')}</span>
+          <div className="flex items-center gap-1">
+            <Users className="h-3.5 w-3.5" />
+            <span>{task.assignedUsers.length}</span>
           </div>
         )}
       </div>

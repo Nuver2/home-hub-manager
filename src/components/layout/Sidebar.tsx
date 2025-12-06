@@ -159,16 +159,17 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background px-4 lg:hidden">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between border-b border-border bg-background/95 backdrop-blur-sm px-4 lg:hidden">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <Home className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="font-semibold">HomeHub</span>
+          <span className="font-semibold text-base">HomeHub</span>
         </div>
         <Button
           variant="ghost"
           size="icon"
+          className="h-10 w-10"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -178,7 +179,7 @@ export function Sidebar() {
       {/* Mobile Sidebar Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -186,7 +187,7 @@ export function Sidebar() {
       {/* Mobile Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-72 bg-sidebar transform transition-transform duration-300 ease-in-out lg:hidden",
+          "fixed top-0 left-0 z-50 h-full w-72 bg-sidebar transform transition-transform duration-200 ease-out lg:hidden",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
