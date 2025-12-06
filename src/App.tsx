@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AnimatePresence } from "framer-motion";
 
 // Pages
 import Login from "./pages/Login";
@@ -74,141 +75,145 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
+  const location = useLocation();
+  
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={
-        <PublicRoute>
-          <Login />
-        </PublicRoute>
-      } />
-      {/* Signup disabled - redirect to login */}
-      <Route path="/signup" element={<Navigate to="/login" replace />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public Routes */}
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+        {/* Signup disabled - redirect to login */}
+        <Route path="/signup" element={<Navigate to="/login" replace />} />
 
-      {/* Protected Routes */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      
-      {/* Tasks */}
-      <Route path="/tasks" element={
-        <ProtectedRoute>
-          <Tasks />
-        </ProtectedRoute>
-      } />
-      <Route path="/tasks/new" element={
-        <ProtectedRoute>
-          <TaskForm />
-        </ProtectedRoute>
-      } />
-      <Route path="/tasks/:id" element={
-        <ProtectedRoute>
-          <TaskDetail />
-        </ProtectedRoute>
-      } />
-      <Route path="/tasks/:id/edit" element={
-        <ProtectedRoute>
-          <TaskForm />
-        </ProtectedRoute>
-      } />
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        
+        {/* Tasks */}
+        <Route path="/tasks" element={
+          <ProtectedRoute>
+            <Tasks />
+          </ProtectedRoute>
+        } />
+        <Route path="/tasks/new" element={
+          <ProtectedRoute>
+            <TaskForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/tasks/:id" element={
+          <ProtectedRoute>
+            <TaskDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/tasks/:id/edit" element={
+          <ProtectedRoute>
+            <TaskForm />
+          </ProtectedRoute>
+        } />
 
-      {/* Shopping Lists */}
-      <Route path="/shopping-lists" element={
-        <ProtectedRoute>
-          <ShoppingLists />
-        </ProtectedRoute>
-      } />
-      <Route path="/shopping-lists/new" element={
-        <ProtectedRoute>
-          <ShoppingListForm />
-        </ProtectedRoute>
-      } />
-      <Route path="/shopping-lists/:id" element={
-        <ProtectedRoute>
-          <ShoppingListDetail />
-        </ProtectedRoute>
-      } />
-      <Route path="/shopping-lists/:id/edit" element={
-        <ProtectedRoute>
-          <ShoppingListForm />
-        </ProtectedRoute>
-      } />
+        {/* Shopping Lists */}
+        <Route path="/shopping-lists" element={
+          <ProtectedRoute>
+            <ShoppingLists />
+          </ProtectedRoute>
+        } />
+        <Route path="/shopping-lists/new" element={
+          <ProtectedRoute>
+            <ShoppingListForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/shopping-lists/:id" element={
+          <ProtectedRoute>
+            <ShoppingListDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/shopping-lists/:id/edit" element={
+          <ProtectedRoute>
+            <ShoppingListForm />
+          </ProtectedRoute>
+        } />
 
-      {/* Staff */}
-      <Route path="/staff" element={
-        <ProtectedRoute>
-          <Staff />
-        </ProtectedRoute>
-      } />
-      <Route path="/staff/new" element={
-        <ProtectedRoute>
-          <StaffForm />
-        </ProtectedRoute>
-      } />
+        {/* Staff */}
+        <Route path="/staff" element={
+          <ProtectedRoute>
+            <Staff />
+          </ProtectedRoute>
+        } />
+        <Route path="/staff/new" element={
+          <ProtectedRoute>
+            <StaffForm />
+          </ProtectedRoute>
+        } />
 
-      {/* Projects */}
-      <Route path="/projects" element={
-        <ProtectedRoute>
-          <Projects />
-        </ProtectedRoute>
-      } />
-      <Route path="/projects/new" element={
-        <ProtectedRoute>
-          <ProjectForm />
-        </ProtectedRoute>
-      } />
-      <Route path="/projects/:id" element={
-        <ProtectedRoute>
-          <ProjectDetail />
-        </ProtectedRoute>
-      } />
-      <Route path="/projects/:id/edit" element={
-        <ProtectedRoute>
-          <ProjectForm />
-        </ProtectedRoute>
-      } />
+        {/* Projects */}
+        <Route path="/projects" element={
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        } />
+        <Route path="/projects/new" element={
+          <ProtectedRoute>
+            <ProjectForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/projects/:id" element={
+          <ProtectedRoute>
+            <ProjectDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/projects/:id/edit" element={
+          <ProtectedRoute>
+            <ProjectForm />
+          </ProtectedRoute>
+        } />
 
-      {/* Suggestions */}
-      <Route path="/suggestions" element={
-        <ProtectedRoute>
-          <Suggestions />
-        </ProtectedRoute>
-      } />
-      <Route path="/suggestions/new" element={
-        <ProtectedRoute>
-          <SuggestionForm />
-        </ProtectedRoute>
-      } />
+        {/* Suggestions */}
+        <Route path="/suggestions" element={
+          <ProtectedRoute>
+            <Suggestions />
+          </ProtectedRoute>
+        } />
+        <Route path="/suggestions/new" element={
+          <ProtectedRoute>
+            <SuggestionForm />
+          </ProtectedRoute>
+        } />
 
-      {/* Activity Log */}
-      <Route path="/activity" element={
-        <ProtectedRoute>
-          <ActivityLog />
-        </ProtectedRoute>
-      } />
+        {/* Activity Log */}
+        <Route path="/activity" element={
+          <ProtectedRoute>
+            <ActivityLog />
+          </ProtectedRoute>
+        } />
 
-      {/* Notifications */}
-      <Route path="/notifications" element={
-        <ProtectedRoute>
-          <Notifications />
-        </ProtectedRoute>
-      } />
+        {/* Notifications */}
+        <Route path="/notifications" element={
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        } />
 
-      {/* Settings */}
-      <Route path="/settings" element={
-        <ProtectedRoute>
-          <Settings />
-        </ProtectedRoute>
-      } />
+        {/* Settings */}
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        } />
 
-      {/* Redirect root to dashboard or login */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Redirect root to dashboard or login */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* 404 */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
 

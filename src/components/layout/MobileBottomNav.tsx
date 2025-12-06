@@ -57,10 +57,10 @@ export function MobileBottomNav() {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 min-w-[4rem]",
+                  "relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 min-w-[4rem] nav-tap press-effect",
                   isActive
                     ? "text-accent"
-                    : "text-muted-foreground active:scale-95"
+                    : "text-muted-foreground"
                 )}
               >
                 <div className={cn(

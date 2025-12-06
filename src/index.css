@@ -193,7 +193,31 @@
 
   /* Touch feedback */
   .touch-feedback {
-    @apply active:scale-[0.98] transition-transform duration-100;
+    @apply active:scale-[0.97] transition-transform duration-150;
+  }
+
+  /* Nav item tap animation */
+  .nav-tap {
+    @apply relative overflow-hidden;
+  }
+
+  .nav-tap::after {
+    content: '';
+    @apply absolute inset-0 bg-accent/20 opacity-0 transition-opacity duration-200;
+  }
+
+  .nav-tap:active::after {
+    @apply opacity-100;
+  }
+
+  /* Press animation for interactive elements */
+  .press-effect {
+    @apply transition-all duration-150 active:scale-[0.95] active:opacity-90;
+  }
+
+  /* Smooth page content transitions */
+  .page-enter {
+    animation: fadeIn 0.25s ease-out, slideUp 0.3s ease-out;
   }
 
   /* Skeleton shimmer */
@@ -284,6 +308,45 @@
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pressIn {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.92); }
+  100% { transform: scale(1); }
 }
 
 /* Custom scrollbar */
