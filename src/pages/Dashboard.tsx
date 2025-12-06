@@ -60,14 +60,24 @@ export default function Dashboard() {
         <div className="p-6 lg:p-8 space-y-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <Skeleton className="h-8 w-64 mb-2" />
-              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-8 w-64 mb-2 skeleton-shimmer" />
+              <Skeleton className="h-4 w-48 skeleton-shimmer" />
             </div>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
             {[1, 2, 3, 4].map(i => (
-              <Skeleton key={i} className="h-32 rounded-xl" />
+              <Skeleton key={i} className="h-32 rounded-xl skeleton-shimmer" />
             ))}
+          </div>
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <Skeleton className="h-6 w-32 skeleton-shimmer" />
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => (
+                  <Skeleton key={i} className="h-20 rounded-xl skeleton-shimmer" />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </DashboardLayout>
@@ -100,7 +110,7 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
           <StatCard
             title="Total Tasks"
             value={stats.totalTasks}
@@ -166,9 +176,12 @@ export default function Dashboard() {
                   </div>
                 ))
               ) : (
-                <div className="rounded-xl border bg-card p-8 text-center">
-                  <CheckSquare className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">No upcoming tasks</p>
+                <div className="rounded-xl border bg-card p-8 text-center animate-fade-in group hover:shadow-soft transition-shadow">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <CheckSquare className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">No upcoming tasks</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">You're all caught up!</p>
                 </div>
               )}
             </div>
@@ -199,9 +212,11 @@ export default function Dashboard() {
                       </div>
                     ))
                   ) : (
-                    <div className="rounded-xl border bg-card p-6 text-center">
-                      <ShoppingCart className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">No active lists</p>
+                    <div className="rounded-xl border bg-card p-6 text-center animate-fade-in group hover:shadow-soft transition-shadow">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <ShoppingCart className="h-5 w-5 text-accent" />
+                      </div>
+                      <p className="text-sm text-muted-foreground font-medium">No active lists</p>
                     </div>
                   )}
                 </div>
