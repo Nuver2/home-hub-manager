@@ -43,11 +43,11 @@ export function FloatingActionButton() {
   }
 
   return (
-    <div className="fixed bottom-[5.5rem] right-4 z-[60] lg:hidden">
+    <div className="fixed bottom-[5rem] right-4 z-[60] lg:hidden">
       {/* Action buttons */}
       <div className={cn(
-        "absolute bottom-16 right-0 flex flex-col-reverse gap-3 transition-all duration-300",
-        isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+        "absolute bottom-16 right-0 flex flex-col-reverse gap-2 transition-all duration-150",
+        isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
       )}>
         {actions.map((action, index) => {
           const Icon = action.icon;
@@ -57,13 +57,16 @@ export function FloatingActionButton() {
               to={action.href}
               onClick={() => setIsOpen(false)}
               className={cn(
-                "flex items-center gap-3 pl-4 pr-5 py-3 rounded-full shadow-lg transition-all duration-200 touch-feedback",
-                action.color,
-                "animate-scale-in"
+                "flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full shadow-lg",
+                action.color
               )}
-              style={{ animationDelay: `${index * 50}ms` }}
+              style={{ 
+                transform: isOpen ? 'scale(1)' : 'scale(0.8)',
+                transitionDelay: isOpen ? `${index * 30}ms` : '0ms',
+                transitionDuration: '100ms'
+              }}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-4 w-4" />
               <span className="text-sm font-medium whitespace-nowrap">{action.label}</span>
             </Link>
           );
@@ -74,8 +77,8 @@ export function FloatingActionButton() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-300",
-          "bg-accent text-accent-foreground hover:shadow-glow",
+          "flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-150",
+          "bg-primary text-primary-foreground active:scale-95",
           isOpen && "rotate-45 bg-muted text-muted-foreground"
         )}
       >
@@ -89,7 +92,7 @@ export function FloatingActionButton() {
       {/* Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-foreground/10 backdrop-blur-sm -z-10"
+          className="fixed inset-0 bg-background/60 backdrop-blur-[2px] -z-10"
           onClick={() => setIsOpen(false)}
         />
       )}

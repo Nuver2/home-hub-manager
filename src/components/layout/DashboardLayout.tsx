@@ -10,9 +10,9 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-screen bg-background">
       <Sidebar />
-      <main className="pt-16 pb-32 lg:pt-0 lg:pb-8 lg:pl-72">
+      <main className="pt-14 pb-24 lg:pt-0 lg:pb-6 lg:pl-72">
         <PageTransition className="min-h-screen">
           {children}
         </PageTransition>

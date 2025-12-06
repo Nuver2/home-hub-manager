@@ -7,7 +7,7 @@ import {
   CheckSquare,
   ShoppingCart,
   Bell,
-  Menu,
+  Settings,
 } from 'lucide-react';
 
 interface NavItem {
@@ -28,7 +28,7 @@ export function MobileBottomNav() {
     { label: 'Tasks', href: '/tasks', icon: CheckSquare },
     { label: 'Shopping', href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
     { label: 'Alerts', href: '/notifications', icon: Bell, badge: unreadCount },
-    { label: 'More', href: '/settings', icon: Menu },
+    { label: 'Settings', href: '/settings', icon: Settings },
   ];
 
   const filteredItems = navItems.filter(item => {
@@ -36,17 +36,16 @@ export function MobileBottomNav() {
     return user && item.roles.includes(user.role);
   });
 
-  // Limit to 5 items for bottom nav
   const displayItems = filteredItems.slice(0, 5);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       {/* Gradient fade effect */}
-      <div className="absolute inset-x-0 -top-6 h-6 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 -top-4 h-4 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       
       {/* Nav bar */}
-      <div className="bg-card/95 backdrop-blur-xl border-t border-border px-2 pb-safe">
-        <div className="flex items-center justify-around py-2">
+      <div className="bg-card/98 backdrop-blur-lg border-t border-border/50 px-1 pb-safe shadow-lg">
+        <div className="flex items-center justify-around">
           {displayItems.map((item) => {
             const isActive = location.pathname === item.href || 
               (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
@@ -57,39 +56,36 @@ export function MobileBottomNav() {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 min-w-[4rem] nav-tap press-effect",
+                  "relative flex flex-col items-center justify-center gap-0.5 py-2 px-3 min-w-[60px] transition-colors duration-100",
                   isActive
-                    ? "text-accent"
-                    : "text-muted-foreground"
+                    ? "text-primary"
+                    : "text-muted-foreground active:text-foreground"
                 )}
               >
-                <div className={cn(
-                  "relative p-1.5 rounded-xl transition-all duration-200",
-                  isActive && "bg-accent/10"
-                )}>
+                <div className="relative p-1">
                   <Icon className={cn(
-                    "h-5 w-5 transition-transform duration-200",
-                    isActive && "scale-110"
+                    "h-5 w-5",
+                    isActive && "text-primary"
                   )} />
                   
                   {/* Badge */}
                   {item.badge && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground animate-pulse-subtle">
-                      {item.badge > 9 ? '9+' : item.badge}
+                    <span className="absolute -top-1 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                      {item.badge > 99 ? '99+' : item.badge}
                     </span>
                   )}
                 </div>
                 
                 <span className={cn(
-                  "text-[10px] font-medium transition-colors",
-                  isActive ? "text-accent" : "text-muted-foreground"
+                  "text-[10px] font-medium",
+                  isActive ? "text-primary" : "text-muted-foreground"
                 )}>
                   {item.label}
                 </span>
                 
                 {/* Active indicator */}
                 {isActive && (
-                  <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-accent" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-primary" />
                 )}
               </Link>
             );
