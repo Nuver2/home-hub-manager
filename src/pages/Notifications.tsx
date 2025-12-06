@@ -56,13 +56,13 @@ export default function Notifications() {
         <div className="p-6 lg:p-8 space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <Skeleton className="h-8 w-40 mb-2" />
-              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-8 w-40 mb-2 skeleton-shimmer" />
+              <Skeleton className="h-4 w-64 skeleton-shimmer" />
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 stagger-children">
             {[1, 2, 3, 4, 5].map(i => (
-              <Skeleton key={i} className="h-20 rounded-xl" />
+              <Skeleton key={i} className="h-20 rounded-xl skeleton-shimmer" />
             ))}
           </div>
         </div>
@@ -108,15 +108,15 @@ export default function Notifications() {
                 <div
                   key={notification.id}
                   className={cn(
-                    "flex gap-4 rounded-xl border p-4 transition-all duration-200 animate-fade-in",
+                    "flex gap-4 rounded-xl border p-4 transition-all duration-200 animate-slide-up group touch-feedback",
                     notification.read 
-                      ? "bg-card" 
-                      : "bg-accent/5 border-accent/20"
+                      ? "bg-card hover:bg-secondary/30" 
+                      : "bg-accent/5 border-accent/20 hover:bg-accent/10"
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-lg shrink-0",
+                    "flex h-10 w-10 items-center justify-center rounded-xl shrink-0 transition-transform group-hover:scale-110",
                     notification.read ? "bg-secondary" : "bg-accent/10"
                   )}>
                     <Icon className={cn(
@@ -151,13 +151,13 @@ export default function Notifications() {
             })}
           </div>
         ) : (
-          <div className="rounded-xl border bg-card p-12 text-center">
-            <div className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Bell className="h-6 w-6 text-muted-foreground" />
+          <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
+            <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+              <Bell className="h-7 w-7 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">No notifications</h3>
-            <p className="text-muted-foreground">
-              You're all caught up! Notifications will appear here.
+            <h3 className="font-semibold text-lg mb-2">All caught up!</h3>
+            <p className="text-muted-foreground max-w-sm mx-auto">
+              You have no notifications right now. We'll let you know when something needs your attention.
             </p>
           </div>
         )}

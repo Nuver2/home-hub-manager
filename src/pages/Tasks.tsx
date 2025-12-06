@@ -58,13 +58,18 @@ export default function Tasks() {
         <div className="p-6 lg:p-8 space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <Skeleton className="h-8 w-32 mb-2" />
-              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-8 w-32 mb-2 skeleton-shimmer" />
+              <Skeleton className="h-4 w-48 skeleton-shimmer" />
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {[1, 2, 3, 4, 5].map(i => (
+              <Skeleton key={i} className="h-10 w-24 rounded-lg skeleton-shimmer shrink-0" />
+            ))}
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <Skeleton key={i} className="h-48 rounded-xl" />
+              <Skeleton key={i} className="h-48 rounded-xl skeleton-shimmer" />
             ))}
           </div>
         </div>
@@ -94,7 +99,7 @@ export default function Tasks() {
         </div>
 
         {/* Status Tabs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0 scrollbar-hide">
           {[
             { value: 'all', label: 'All', count: statusCounts.all },
             { value: 'to_do', label: 'To Do', count: statusCounts.to_do },
@@ -106,29 +111,34 @@ export default function Tasks() {
               key={tab.value}
               onClick={() => setStatusFilter(tab.value)}
               className={cn(
-                "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all",
+                "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 whitespace-nowrap touch-feedback shrink-0",
                 statusFilter === tab.value
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               )}
             >
               {tab.label}
-              <Badge variant={statusFilter === tab.value ? "secondary" : "outline"} className="ml-1">
+              <span className={cn(
+                "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium",
+                statusFilter === tab.value 
+                  ? "bg-primary-foreground/20 text-primary-foreground" 
+                  : "bg-muted text-muted-foreground"
+              )}>
                 {tab.count}
-              </Badge>
+              </span>
             </button>
           ))}
         </div>
 
         {/* Filters Bar */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search tasks..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-11"
             />
           </div>
           <div className="flex gap-2">
@@ -197,21 +207,21 @@ export default function Tasks() {
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border bg-card p-12 text-center">
-            <div className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Search className="h-6 w-6 text-muted-foreground" />
+          <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
+            <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Search className="h-7 w-7 text-muted-foreground" />
             </div>
             <h3 className="font-semibold text-lg mb-2">No tasks found</h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
               {search || statusFilter !== 'all' || priorityFilter !== 'all' || categoryFilter !== 'all'
-                ? 'Try adjusting your filters'
+                ? 'Try adjusting your search or filters to find what you\'re looking for'
                 : 'Get started by creating your first task'}
             </p>
             {isParent && (
               <Link to="/tasks/new">
-                <Button variant="accent">
+                <Button variant="accent" size="lg" className="touch-feedback">
                   <Plus className="h-4 w-4" />
-                  Create Task
+                  Create Your First Task
                 </Button>
               </Link>
             )}
