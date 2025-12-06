@@ -43,7 +43,7 @@ export function FloatingActionButton() {
   }
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 lg:hidden">
+    <div className="fixed bottom-20 right-4 z-40 lg:hidden">
       {/* Action buttons */}
       <div className={cn(
         "absolute bottom-16 right-0 flex flex-col-reverse gap-3 transition-all duration-300",
