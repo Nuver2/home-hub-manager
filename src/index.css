@@ -133,20 +133,21 @@
 }
 
 @layer utilities {
+  /* Fast, mobile-optimized animations */
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
+    animation: fadeIn 0.15s ease-out forwards;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.4s ease-out forwards;
+    animation: slideUp 0.2s ease-out forwards;
   }
 
   .animate-slide-in-right {
-    animation: slideInRight 0.3s ease-out forwards;
+    animation: slideInRight 0.15s ease-out forwards;
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.2s ease-out forwards;
+    animation: scaleIn 0.1s ease-out forwards;
   }
 
   .animate-pulse-subtle {
@@ -154,11 +155,11 @@
   }
 
   .animate-bounce-subtle {
-    animation: bounceSubtle 0.5s ease-out;
+    animation: bounceSubtle 0.3s ease-out;
   }
 
   .animate-shake {
-    animation: shake 0.5s ease-in-out;
+    animation: shake 0.3s ease-in-out;
   }
 
   .glass-effect {
@@ -191,33 +192,19 @@
     padding-top: env(safe-area-inset-top, 0);
   }
 
-  /* Touch feedback */
+  /* Touch feedback - instant response */
   .touch-feedback {
-    @apply active:scale-[0.97] transition-transform duration-150;
+    @apply active:scale-[0.97] transition-transform duration-75;
   }
 
   /* Nav item tap animation */
   .nav-tap {
-    @apply relative overflow-hidden;
-  }
-
-  .nav-tap::after {
-    content: '';
-    @apply absolute inset-0 bg-accent/20 opacity-0 transition-opacity duration-200;
-  }
-
-  .nav-tap:active::after {
-    @apply opacity-100;
+    @apply relative overflow-hidden active:bg-accent/10 transition-colors duration-75;
   }
 
   /* Press animation for interactive elements */
   .press-effect {
-    @apply transition-all duration-150 active:scale-[0.95] active:opacity-90;
-  }
-
-  /* Smooth page content transitions */
-  .page-enter {
-    animation: fadeIn 0.25s ease-out, slideUp 0.3s ease-out;
+    @apply transition-transform duration-75 active:scale-[0.96];
   }
 
   /* Skeleton shimmer */
@@ -233,21 +220,27 @@
     animation: shimmer 1.5s infinite;
   }
 
-  /* Card interactive states */
+  /* Card interactive states - mobile optimized */
   .card-interactive {
-    @apply transition-all duration-200 hover:shadow-medium hover:-translate-y-0.5 active:scale-[0.99];
+    @apply transition-transform duration-100 active:scale-[0.98];
   }
 
-  /* Stagger children animations */
+  @media (hover: hover) {
+    .card-interactive {
+      @apply hover:shadow-medium hover:-translate-y-0.5;
+    }
+  }
+
+  /* Stagger children animations - reduced delays */
   .stagger-children > * {
-    @apply animate-slide-up;
+    @apply animate-fade-in;
   }
   .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger-children > *:nth-child(2) { animation-delay: 50ms; }
-  .stagger-children > *:nth-child(3) { animation-delay: 100ms; }
-  .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
-  .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
-  .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+  .stagger-children > *:nth-child(2) { animation-delay: 30ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 60ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 90ms; }
+  .stagger-children > *:nth-child(5) { animation-delay: 120ms; }
+  .stagger-children > *:nth-child(6) { animation-delay: 150ms; }
 }
 
 @keyframes fadeIn {
@@ -382,5 +375,14 @@
 @media (max-width: 768px) {
   button, a, [role="button"] {
     min-height: 44px;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
