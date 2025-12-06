@@ -21,8 +21,8 @@ import {
   FolderKanban,
 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
-import { format } from 'date-fns';
 import { useActivityLog } from '@/hooks/useActivityLog';
+import { formatRelativeTime } from '@/lib/date-utils';
 
 const targetTypeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   task: CheckSquare,
@@ -65,12 +65,17 @@ export default function ActivityLog() {
       <DashboardLayout>
         <div className="p-6 lg:p-8 space-y-6">
           <div>
-            <Skeleton className="h-8 w-40 mb-2" />
-            <Skeleton className="h-4 w-64" />
+            <Skeleton className="h-8 w-40 mb-2 skeleton-shimmer" />
+            <Skeleton className="h-4 w-64 skeleton-shimmer" />
           </div>
-          <div className="space-y-4">
+          <div className="flex gap-3">
+            <Skeleton className="h-11 flex-1 skeleton-shimmer" />
+            <Skeleton className="h-11 w-40 skeleton-shimmer" />
+            <Skeleton className="h-11 w-40 skeleton-shimmer" />
+          </div>
+          <div className="space-y-4 stagger-children">
             {[1, 2, 3, 4, 5].map(i => (
-              <Skeleton key={i} className="h-24 rounded-xl" />
+              <Skeleton key={i} className="h-24 rounded-xl skeleton-shimmer" />
             ))}
           </div>
         </div>
@@ -129,17 +134,16 @@ export default function ActivityLog() {
 
         {/* Activity List */}
         {filteredActivities.length > 0 ? (
-          <div className="space-y-4">
-            {filteredActivities.map((activity, index) => {
+          <div className="space-y-3 stagger-children">
+            {filteredActivities.map((activity) => {
               const Icon = targetTypeIcons[activity.target_type] || Activity;
               
               return (
                 <div
                   key={activity.id}
-                  className="flex gap-4 rounded-xl border bg-card p-4 animate-fade-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  className="flex gap-4 rounded-xl border bg-card p-4 card-interactive group touch-feedback"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary shrink-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary shrink-0 group-hover:scale-110 transition-transform">
                     <Icon className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -155,8 +159,8 @@ export default function ActivityLog() {
                     {activity.details && (
                       <p className="text-sm text-muted-foreground">{activity.details}</p>
                     )}
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {format(new Date(activity.created_at), 'MMM d, yyyy • h:mm a')}
+                    <p className="text-xs text-muted-foreground/70 mt-2">
+                      {formatRelativeTime(activity.created_at)}
                     </p>
                   </div>
                 </div>
@@ -164,15 +168,15 @@ export default function ActivityLog() {
             })}
           </div>
         ) : (
-          <div className="rounded-xl border bg-card p-12 text-center">
-            <div className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Activity className="h-6 w-6 text-muted-foreground" />
+          <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
+            <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+              <Activity className="h-7 w-7 text-muted-foreground" />
             </div>
             <h3 className="font-semibold text-lg mb-2">No activities found</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground max-w-sm mx-auto">
               {search || typeFilter !== 'all' || actionFilter !== 'all'
-                ? 'Try adjusting your filters'
-                : 'Activities will appear here as actions are taken'}
+                ? 'Try adjusting your filters to find what you\'re looking for'
+                : 'Activities will appear here as actions are taken in the system'}
             </p>
           </div>
         )}

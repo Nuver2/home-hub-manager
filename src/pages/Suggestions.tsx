@@ -80,13 +80,18 @@ export default function Suggestions() {
         <div className="p-6 lg:p-8 space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <Skeleton className="h-8 w-40 mb-2" />
-              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-8 w-40 mb-2 skeleton-shimmer" />
+              <Skeleton className="h-4 w-64 skeleton-shimmer" />
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="flex gap-2">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className="h-10 w-24 rounded-lg skeleton-shimmer" />
+            ))}
+          </div>
+          <div className="space-y-4 stagger-children">
             {[1, 2, 3].map(i => (
-              <Skeleton key={i} className="h-40 rounded-xl" />
+              <Skeleton key={i} className="h-40 rounded-xl skeleton-shimmer" />
             ))}
           </div>
         </div>
@@ -116,7 +121,7 @@ export default function Suggestions() {
         </div>
 
         {/* Status Tabs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0 scrollbar-hide">
           {statusTabs.map((tab) => {
             const count = tab.value === 'all' 
               ? suggestions.length 
@@ -127,17 +132,22 @@ export default function Suggestions() {
                 key={tab.value}
                 onClick={() => setStatusFilter(tab.value)}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all",
+                  "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 whitespace-nowrap touch-feedback shrink-0",
                   statusFilter === tab.value
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                 )}
               >
                 {tab.label}
                 {count > 0 && (
-                  <Badge variant={statusFilter === tab.value ? "secondary" : "outline"} className="ml-1">
+                  <span className={cn(
+                    "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium",
+                    statusFilter === tab.value 
+                      ? "bg-primary-foreground/20 text-primary-foreground" 
+                      : "bg-muted text-muted-foreground"
+                  )}>
                     {count}
-                  </Badge>
+                  </span>
                 )}
               </button>
             );
@@ -151,7 +161,7 @@ export default function Suggestions() {
             placeholder="Search suggestions..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-11"
           />
         </div>
 
