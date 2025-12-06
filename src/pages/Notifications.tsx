@@ -11,10 +11,10 @@ import {
   Lightbulb,
   MessageSquare,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks/useNotifications';
+import { formatRelativeTime } from '@/lib/date-utils';
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   task_assigned: CheckSquare,
@@ -132,7 +132,7 @@ export default function Notifications() {
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(notification.created_at), 'MMM d, yyyy • h:mm a')}
+                      {formatRelativeTime(notification.created_at)}
                     </p>
                   </div>
                   {!notification.read && (
