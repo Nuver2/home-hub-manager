@@ -5,6 +5,30 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 5; // Max 5 user creations per minute
+
+// In-memory rate limit store (per instance - for production use Redis/Supabase)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const record = rateLimitStore.get(userId);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+  
+  record.count++;
+  return false;
+}
+
 // Validation constants
 const VALID_ROLES = ['parent', 'driver', 'chef', 'cleaner', 'other'] as const;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -12,6 +36,15 @@ const MAX_NAME_LENGTH = 100;
 const MAX_USERNAME_LENGTH = 50;
 const MAX_PHONE_LENGTH = 20;
 const MIN_PASSWORD_LENGTH = 8;
+
+// Password complexity requirements
+const PASSWORD_REQUIREMENTS = {
+  minLength: 8,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumber: true,
+  requireSpecialChar: false, // Can enable for stricter security
+};
 
 // Sanitize string input
 function sanitizeString(input: string, maxLength: number): string {
@@ -36,6 +69,31 @@ function isValidPhone(phone: string | null | undefined): boolean {
   if (!phone) return true; // Optional field
   const cleaned = phone.replace(/[\s\-\(\)]/g, '');
   return /^\+?[0-9]{7,15}$/.test(cleaned);
+}
+
+// Validate password complexity
+function validatePassword(password: string): { valid: boolean; message?: string } {
+  if (password.length < PASSWORD_REQUIREMENTS.minLength) {
+    return { valid: false, message: `Password must be at least ${PASSWORD_REQUIREMENTS.minLength} characters` };
+  }
+  
+  if (PASSWORD_REQUIREMENTS.requireUppercase && !/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+  }
+  
+  if (PASSWORD_REQUIREMENTS.requireLowercase && !/[a-z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+  }
+  
+  if (PASSWORD_REQUIREMENTS.requireNumber && !/[0-9]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one number' };
+  }
+  
+  if (PASSWORD_REQUIREMENTS.requireSpecialChar && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one special character' };
+  }
+  
+  return { valid: true };
 }
 
 Deno.serve(async (req) => {
@@ -73,6 +131,22 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Rate limiting check
+    if (isRateLimited(requestingUser.id)) {
+      console.log(`Create user failed: Rate limit exceeded for user ${requestingUser.id}`)
+      return new Response(JSON.stringify({ 
+        error: 'Too many requests. Please wait before creating more users.',
+        retryAfter: 60 
+      }), {
+        status: 429,
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'Retry-After': '60'
+        },
       })
     }
 
@@ -133,10 +207,11 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Validate password strength
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      console.log('Create user failed: Password too short')
-      return new Response(JSON.stringify({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` }), {
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      console.log('Create user failed: Password does not meet requirements')
+      return new Response(JSON.stringify({ error: passwordValidation.message }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

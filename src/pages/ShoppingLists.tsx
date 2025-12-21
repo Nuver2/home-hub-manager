@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Pagination } from '@/components/Pagination';
+import { BulkActionsBar } from '@/components/BulkActionsBar';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import {
   Select,
   SelectContent,
@@ -17,20 +20,35 @@ import {
   Plus,
   Search,
   ShoppingCart,
+  Trash2,
+  CheckCircle,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useShoppingLists } from '@/hooks/useShoppingLists';
+import { useShoppingLists, useUpdateShoppingList, useDeleteShoppingList } from '@/hooks/useShoppingLists';
+import { usePagination } from '@/hooks/usePagination';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function ShoppingLists() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: shoppingLists = [], isLoading } = useShoppingLists();
+  const updateList = useUpdateShoppingList();
+  const deleteList = useDeleteShoppingList();
   const isParent = user?.role === 'parent';
   const isChef = user?.role === 'chef';
+  const isMobile = useIsMobile();
   
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts();
 
   const filteredLists = shoppingLists.filter(list => {
     const matchesSearch = list.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -41,6 +59,29 @@ export default function ShoppingLists() {
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
+  // Pagination
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    goToPage,
+    totalItems,
+    startIndex,
+    endIndex,
+  } = usePagination({ data: filteredLists, itemsPerPage: 12 });
+
+  // Bulk selection
+  const {
+    isSelected,
+    toggleSelection,
+    toggleSelectAll,
+    deselectAll,
+    isAllSelected,
+    isSomeSelected,
+    selectedCount,
+    selectedIds,
+  } = useBulkSelection({ items: paginatedData });
+
   const statusTabs = [
     { value: 'all', label: 'All' },
     { value: 'draft', label: 'Draft' },
@@ -49,6 +90,36 @@ export default function ShoppingLists() {
     { value: 'delivered', label: 'Delivered' },
     { value: 'completed', label: 'Completed' },
   ];
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['shopping-lists'] });
+  }, [queryClient]);
+
+  const handleBulkComplete = async () => {
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map(id =>
+          updateList.mutateAsync({ id, status: 'completed' })
+        )
+      );
+      toast.success(`${selectedCount} lists marked as completed`);
+      deselectAll();
+    } catch {
+      toast.error('Failed to update lists');
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map(id => deleteList.mutateAsync(id))
+      );
+      toast.success(`${selectedCount} lists deleted`);
+      deselectAll();
+    } catch {
+      toast.error('Failed to delete lists');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -75,121 +146,193 @@ export default function ShoppingLists() {
     );
   }
 
-  return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold">Shopping Lists</h1>
-            <p className="text-muted-foreground mt-1">
-              {isParent 
-                ? 'Manage all shopping lists' 
-                : isChef 
-                  ? 'Create and manage your shopping lists'
-                  : 'View your assigned shopping lists'}
-            </p>
-          </div>
-          {(isParent || isChef) && (
-            <Link to="/shopping-lists/new">
-              <Button variant="accent">
-                <Plus className="h-4 w-4" />
-                New List
-              </Button>
-            </Link>
-          )}
+  const content = (
+    <div className="p-6 lg:p-8 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold">Shopping Lists</h1>
+          <p className="text-muted-foreground mt-1">
+            {isParent 
+              ? 'Manage all shopping lists' 
+              : isChef 
+                ? 'Create and manage your shopping lists'
+                : 'View your assigned shopping lists'}
+          </p>
         </div>
+        {(isParent || isChef) && (
+          <Link to="/shopping-lists/new">
+            <Button variant="accent">
+              <Plus className="h-4 w-4" />
+              New List
+            </Button>
+          </Link>
+        )}
+      </div>
 
-        {/* Status Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0 scrollbar-hide">
-          {statusTabs.map((tab) => {
-            const count = tab.value === 'all' 
-              ? shoppingLists.length 
-              : shoppingLists.filter(l => l.status === tab.value).length;
-            
-            return (
-              <button
-                key={tab.value}
-                onClick={() => setStatusFilter(tab.value)}
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 whitespace-nowrap touch-feedback shrink-0",
-                  statusFilter === tab.value
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                )}
-              >
-                {tab.label}
-                {count > 0 && (
-                  <span className={cn(
-                    "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium",
-                    statusFilter === tab.value 
-                      ? "bg-primary-foreground/20 text-primary-foreground" 
-                      : "bg-muted text-muted-foreground"
-                  )}>
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+      {/* Status Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0 scrollbar-hide">
+        {statusTabs.map((tab) => {
+          const count = tab.value === 'all' 
+            ? shoppingLists.length 
+            : shoppingLists.filter(l => l.status === tab.value).length;
+          
+          return (
+            <button
+              key={tab.value}
+              onClick={() => setStatusFilter(tab.value)}
+              className={cn(
+                "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 whitespace-nowrap touch-feedback shrink-0",
+                statusFilter === tab.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              )}
+            >
+              {tab.label}
+              {count > 0 && (
+                <span className={cn(
+                  "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium",
+                  statusFilter === tab.value 
+                    ? "bg-primary-foreground/20 text-primary-foreground" 
+                    : "bg-muted text-muted-foreground"
+                )}>
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filters Bar */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search shopping lists..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 h-11"
+          />
         </div>
+        <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Priority" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Priority</SelectItem>
+            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="high">High</SelectItem>
+            <SelectItem value="urgent">Urgent</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* Filters Bar */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search shopping lists..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-11"
-            />
-          </div>
-          <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Priority</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Select All (for bulk actions) */}
+      {isParent && paginatedData.length > 0 && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Checkbox
+            checked={isAllSelected}
+            onCheckedChange={toggleSelectAll}
+            className="data-[state=indeterminate]:bg-primary"
+            {...(isSomeSelected ? { 'data-state': 'indeterminate' } : {})}
+          />
+          <span>Select all ({paginatedData.length} items)</span>
         </div>
+      )}
 
-        {/* Shopping Lists Grid */}
-        {filteredLists.length > 0 ? (
+      {/* Shopping Lists Grid */}
+      {paginatedData.length > 0 ? (
+        <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-            {filteredLists.map((list) => (
-              <div key={list.id}>
+            {paginatedData.map((list) => (
+              <div key={list.id} className={cn("relative", isParent && "group")}>
+                {isParent && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <Checkbox
+                      checked={isSelected(list.id)}
+                      onCheckedChange={() => toggleSelection(list.id)}
+                      className="bg-background"
+                    />
+                  </div>
+                )}
                 <ShoppingListCard list={list} />
               </div>
             ))}
           </div>
-        ) : (
-          <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
-            <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <ShoppingCart className="h-6 w-6 text-muted-foreground" />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing {startIndex} to {endIndex} of {totalItems} lists
+              </p>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+              />
             </div>
-            <h3 className="font-semibold text-lg mb-2">No shopping lists found</h3>
-            <p className="text-muted-foreground mb-4">
-              {search || statusFilter !== 'all' || priorityFilter !== 'all'
-                ? 'Try adjusting your filters'
-                : 'Get started by creating your first shopping list'}
-            </p>
-            {(isParent || isChef) && (
-              <Link to="/shopping-lists/new">
-                <Button variant="accent">
-                  <Plus className="h-4 w-4" />
-                  Create Shopping List
-                </Button>
-              </Link>
-            )}
+          )}
+        </>
+      ) : (
+        <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
+          <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+            <ShoppingCart className="h-6 w-6 text-muted-foreground" />
           </div>
-        )}
-      </div>
+          <h3 className="font-semibold text-lg mb-2">No shopping lists found</h3>
+          <p className="text-muted-foreground mb-4">
+            {search || statusFilter !== 'all' || priorityFilter !== 'all'
+              ? 'Try adjusting your filters'
+              : 'Get started by creating your first shopping list'}
+          </p>
+          {(isParent || isChef) && (
+            <Link to="/shopping-lists/new">
+              <Button variant="accent">
+                <Plus className="h-4 w-4" />
+                Create Shopping List
+              </Button>
+            </Link>
+          )}
+        </div>
+      )}
+
+      {/* Bulk Actions Bar */}
+      {isParent && (
+        <BulkActionsBar selectedCount={selectedCount} onClear={deselectAll}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBulkComplete}
+            className="text-primary-foreground hover:bg-primary-foreground/20"
+          >
+            <CheckCircle className="h-4 w-4 mr-1" />
+            Complete
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBulkDelete}
+            className="text-primary-foreground hover:bg-primary-foreground/20"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
+        </BulkActionsBar>
+      )}
+    </div>
+  );
+
+  return (
+    <DashboardLayout>
+      {isMobile ? (
+        <PullToRefresh onRefresh={handleRefresh}>
+          {content}
+        </PullToRefresh>
+      ) : (
+        content
+      )}
     </DashboardLayout>
   );
 }
