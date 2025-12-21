@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Home, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +29,11 @@ export default function Login() {
       if (error) {
         setError(error);
       } else {
-        toast.success('Welcome back!');
+        toast.success(t('auth.welcomeBack'));
         navigate('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.');
+      setError(err.message || t('errors.generic'));
     } finally {
       setIsLoading(false);
     }
@@ -44,6 +47,11 @@ export default function Login() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher variant="compact" />
+      </div>
+
       <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo & Header */}
         <div className="text-center space-y-4 animate-slide-up">
@@ -53,17 +61,17 @@ export default function Login() {
             </div>
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">HomeHub</h1>
-            <p className="text-muted-foreground mt-1">Household Staff Management</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t('app.name')}</h1>
+            <p className="text-muted-foreground mt-1">{t('app.tagline')}</p>
           </div>
         </div>
 
         {/* Login Card */}
         <Card className="border-0 shadow-medium animate-slide-up" style={{ animationDelay: '100ms' }}>
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl">Sign in</CardTitle>
+            <CardTitle className="text-xl">{t('auth.signIn')}</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              {t('auth.credentials')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -76,11 +84,11 @@ export default function Login() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('auth.enterEmail')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -90,11 +98,11 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('auth.password')}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t('auth.enterPassword')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -111,19 +119,19 @@ export default function Login() {
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                Sign In
+                {t('auth.signIn')}
               </Button>
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Contact your administrator if you need an account
+              {t('auth.contactAdmin')}
             </p>
           </CardContent>
         </Card>
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/60 animate-fade-in" style={{ animationDelay: '200ms' }}>
-          Secure login powered by HomeHub
+          {t('auth.secureLogin')}
         </p>
       </div>
     </div>

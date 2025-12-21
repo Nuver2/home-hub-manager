@@ -22,8 +22,10 @@ import { useTasks } from '@/hooks/useTasks';
 import { useShoppingLists } from '@/hooks/useShoppingLists';
 import { useSuggestions } from '@/hooks/useSuggestions';
 import { useStaff } from '@/hooks/useStaff';
+import { useTranslation } from 'react-i18next';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: tasks = [], isLoading: tasksLoading } = useTasks();
   const { data: shoppingLists = [], isLoading: listsLoading } = useShoppingLists();
@@ -91,7 +93,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl lg:text-2xl font-bold">
-              Hi, {user?.name?.split(' ')[0] || 'there'}! 👋
+              {t('dashboard.greeting')}, {user?.name?.split(' ')[0] || 'there'}! 👋
             </h1>
             <p className="text-muted-foreground text-sm mt-0.5">
               {format(new Date(), 'EEEE, MMM d')}
@@ -101,7 +103,7 @@ export default function Dashboard() {
             <Link to="/tasks/new" className="hidden sm:block">
               <Button variant="accent" size="sm">
                 <Plus className="h-4 w-4" />
-                New Task
+                {t('dashboard.newTask')}
               </Button>
             </Link>
           )}
@@ -110,30 +112,30 @@ export default function Dashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
           <StatCard
-            title="Tasks"
+            title={t('dashboard.tasks')}
             value={stats.totalTasks}
-            subtitle={`${stats.completedTasks} done`}
+            subtitle={`${stats.completedTasks} ${t('dashboard.done')}`}
             icon={CheckSquare}
             variant="default"
           />
           <StatCard
-            title="In Progress"
+            title={t('dashboard.inProgress')}
             value={stats.inProgressTasks}
             icon={Clock}
             variant="info"
           />
           {(isParent || user?.role === 'chef' || user?.role === 'driver') && (
             <StatCard
-              title="Shopping"
+              title={t('dashboard.shopping')}
               value={stats.totalShoppingLists}
-              subtitle={`${stats.activeShoppingLists} active`}
+              subtitle={`${stats.activeShoppingLists} ${t('dashboard.active')}`}
               icon={ShoppingCart}
               variant="accent"
             />
           )}
           {isParent && (
             <StatCard
-              title="Staff"
+              title={t('dashboard.staff')}
               value={stats.totalStaff}
               icon={Users}
               variant="success"
@@ -141,7 +143,7 @@ export default function Dashboard() {
           )}
           {!isParent && (
             <StatCard
-              title="Pending"
+              title={t('dashboard.pending')}
               value={stats.pendingTasks}
               icon={CalendarDays}
               variant="warning"
@@ -154,10 +156,10 @@ export default function Dashboard() {
           {/* Upcoming Tasks */}
           <div className="lg:col-span-2 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold">Upcoming Tasks</h2>
+              <h2 className="font-semibold">{t('dashboard.upcomingTasks')}</h2>
               <Link to="/tasks">
                 <Button variant="ghost" size="sm" className="h-8 text-xs">
-                  View all
+                  {t('common.viewAll')}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
@@ -172,8 +174,8 @@ export default function Dashboard() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary mx-auto mb-3">
                     <CheckSquare className="h-5 w-5 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground font-medium">No upcoming tasks</p>
-                  <p className="text-xs text-muted-foreground/70 mt-1">You're all caught up!</p>
+                  <p className="text-sm text-muted-foreground font-medium">{t('dashboard.noUpcomingTasks')}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">{t('dashboard.allCaughtUp')}</p>
                 </div>
               )}
             </div>
@@ -185,7 +187,7 @@ export default function Dashboard() {
             {(isParent || user?.role === 'chef' || user?.role === 'driver') && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold">Active Shopping</h2>
+                  <h2 className="font-semibold">{t('dashboard.activeShopping')}</h2>
                   <Link to="/shopping-lists">
                     <Button variant="ghost" size="sm" className="h-8">
                       <ArrowRight className="h-3.5 w-3.5" />
@@ -202,7 +204,7 @@ export default function Dashboard() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 mx-auto mb-2">
                         <ShoppingCart className="h-4 w-4 text-accent" />
                       </div>
-                      <p className="text-xs text-muted-foreground">No active lists</p>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.noActiveLists')}</p>
                     </div>
                   )}
                 </div>
@@ -213,7 +215,7 @@ export default function Dashboard() {
             {isParent && pendingSuggestions.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold">Suggestions</h2>
+                  <h2 className="font-semibold">{t('dashboard.suggestions')}</h2>
                   <Badge variant="warning" className="text-[10px]">{pendingSuggestions.length}</Badge>
                 </div>
                 <div className="space-y-2">
@@ -243,30 +245,30 @@ export default function Dashboard() {
             {/* Quick Actions - Desktop only */}
             {isParent && (
               <div className="hidden lg:block space-y-3">
-                <h2 className="font-semibold">Quick Actions</h2>
+                <h2 className="font-semibold">{t('dashboard.quickActions')}</h2>
                 <div className="grid grid-cols-2 gap-2">
                   <Link to="/tasks/new">
                     <Button variant="outline" className="w-full justify-start h-9 text-xs" size="sm">
                       <CheckSquare className="h-3.5 w-3.5" />
-                      New Task
+                      {t('dashboard.newTask')}
                     </Button>
                   </Link>
                   <Link to="/shopping-lists/new">
                     <Button variant="outline" className="w-full justify-start h-9 text-xs" size="sm">
                       <ShoppingCart className="h-3.5 w-3.5" />
-                      New List
+                      {t('dashboard.newList')}
                     </Button>
                   </Link>
                   <Link to="/staff/new">
                     <Button variant="outline" className="w-full justify-start h-9 text-xs" size="sm">
                       <Users className="h-3.5 w-3.5" />
-                      Add Staff
+                      {t('dashboard.addStaff')}
                     </Button>
                   </Link>
                   <Link to="/projects/new">
                     <Button variant="outline" className="w-full justify-start h-9 text-xs" size="sm">
                       <CalendarDays className="h-3.5 w-3.5" />
-                      New Project
+                      {t('dashboard.newProject')}
                     </Button>
                   </Link>
                 </div>

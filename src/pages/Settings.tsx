@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   User,
   Lock,
@@ -15,35 +16,30 @@ import {
   Sun,
   Moon,
   Monitor,
+  Languages,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
-
-const roleLabels: Record<string, string> = {
-  parent: 'Administrator',
-  driver: 'Driver',
-  chef: 'Chef',
-  cleaner: 'Cleaner',
-  other: 'Staff',
-};
+import { useTranslation } from 'react-i18next';
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const handleSaveProfile = () => {
-    toast.success('Profile updated successfully');
+    toast.success(t('success.profileUpdated'));
   };
 
   const handleChangePassword = () => {
-    toast.success('Password changed successfully');
+    toast.success(t('success.passwordChanged'));
   };
 
   const themeOptions = [
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
-    { value: 'system', label: 'System', icon: Monitor },
+    { value: 'light', label: t('settings.light'), icon: Sun },
+    { value: 'dark', label: t('settings.dark'), icon: Moon },
+    { value: 'system', label: t('settings.system'), icon: Monitor },
   ] as const;
 
   return (
@@ -51,10 +47,8 @@ export default function Settings() {
       <div className="p-6 lg:p-8 space-y-6 max-w-4xl">
         {/* Header */}
         <div className="animate-slide-up">
-          <h1 className="text-2xl lg:text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your account and preferences
-          </p>
+          <h1 className="text-2xl lg:text-3xl font-bold">{t('settings.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('settings.manageAccount')}</p>
         </div>
 
         {/* Profile Section */}
@@ -65,8 +59,8 @@ export default function Settings() {
                 <User className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Profile</CardTitle>
-                <CardDescription>Update your personal information</CardDescription>
+                <CardTitle>{t('settings.profile')}</CardTitle>
+                <CardDescription>{t('settings.updateInfo')}</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -79,7 +73,7 @@ export default function Settings() {
                 <p className="font-semibold text-lg">{user?.name}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant={user?.role as 'parent' | 'driver' | 'chef' | 'cleaner' | 'other'}>
-                    {roleLabels[user?.role || '']}
+                    {t(`roles.${user?.role}`)}
                   </Badge>
                   <span className="text-sm text-muted-foreground">@{user?.username}</span>
                 </div>
@@ -88,16 +82,16 @@ export default function Settings() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('settings.fullName')}</Label>
                 <Input id="name" defaultValue={user?.name} className="h-11" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">{t('settings.phoneNumber')}</Label>
                 <Input id="phone" defaultValue={user?.phone_number || ''} className="h-11" />
               </div>
             </div>
 
-            <Button onClick={handleSaveProfile} className="touch-feedback">Save Changes</Button>
+            <Button onClick={handleSaveProfile} className="touch-feedback">{t('settings.saveChanges')}</Button>
           </CardContent>
         </Card>
 
@@ -109,17 +103,15 @@ export default function Settings() {
                 <Palette className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Appearance</CardTitle>
-                <CardDescription>Customize how the app looks</CardDescription>
+                <CardTitle>{t('settings.appearance')}</CardTitle>
+                <CardDescription>{t('settings.customize')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div>
-              <Label className="text-base">Theme</Label>
-              <p className="text-sm text-muted-foreground mb-3">
-                Choose your preferred color scheme
-              </p>
+              <Label className="text-base">{t('settings.theme')}</Label>
+              <p className="text-sm text-muted-foreground mb-3">{t('settings.chooseTheme')}</p>
               <div className="grid grid-cols-3 gap-3">
                 {themeOptions.map((option) => {
                   const Icon = option.icon;
@@ -141,16 +133,19 @@ export default function Settings() {
                       )}>
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className={cn(
-                        "text-sm font-medium",
-                        isSelected && "text-accent"
-                      )}>
+                      <span className={cn("text-sm font-medium", isSelected && "text-accent")}>
                         {option.label}
                       </span>
                     </button>
                   );
                 })}
               </div>
+            </div>
+
+            <div>
+              <Label className="text-base">{t('settings.language')}</Label>
+              <p className="text-sm text-muted-foreground mb-3">{t('settings.chooseLanguage')}</p>
+              <LanguageSwitcher />
             </div>
           </CardContent>
         </Card>
@@ -163,29 +158,29 @@ export default function Settings() {
                 <Lock className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Security</CardTitle>
-                <CardDescription>Manage your password and security settings</CardDescription>
+                <CardTitle>{t('settings.security')}</CardTitle>
+                <CardDescription>{t('settings.managePassword')}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
+                <Label htmlFor="current-password">{t('settings.currentPassword')}</Label>
                 <Input id="current-password" type="password" className="h-11" />
               </div>
               <div></div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
+                <Label htmlFor="new-password">{t('settings.newPassword')}</Label>
                 <Input id="new-password" type="password" className="h-11" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Label htmlFor="confirm-password">{t('settings.confirmPassword')}</Label>
                 <Input id="confirm-password" type="password" className="h-11" />
               </div>
             </div>
 
-            <Button onClick={handleChangePassword} className="touch-feedback">Change Password</Button>
+            <Button onClick={handleChangePassword} className="touch-feedback">{t('settings.changePassword')}</Button>
           </CardContent>
         </Card>
 
@@ -197,18 +192,18 @@ export default function Settings() {
                 <Bell className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Notifications</CardTitle>
-                <CardDescription>Configure how you receive notifications</CardDescription>
+                <CardTitle>{t('settings.notificationSettings')}</CardTitle>
+                <CardDescription>{t('settings.configureNotifications')}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
               {[
-                { label: 'Task assignments', description: 'When a task is assigned to you' },
-                { label: 'Task updates', description: 'When a task status changes' },
-                { label: 'Shopping list updates', description: 'When a shopping list is updated' },
-                { label: 'Comments', description: 'When someone comments on your tasks' },
+                { label: t('settings.taskAssignments'), description: t('settings.whenTaskAssigned') },
+                { label: t('settings.taskUpdates'), description: t('settings.whenTaskChanges') },
+                { label: t('settings.shoppingUpdates'), description: t('settings.whenListUpdated') },
+                { label: t('settings.comments'), description: t('settings.whenCommented') },
               ].map((item, index) => (
                 <div 
                   key={index} 
@@ -230,12 +225,12 @@ export default function Settings() {
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="font-medium">Sign out of your account</p>
-                <p className="text-sm text-muted-foreground">You will need to sign in again to access the app</p>
+                <p className="font-medium">{t('settings.signOutAccount')}</p>
+                <p className="text-sm text-muted-foreground">{t('settings.needSignIn')}</p>
               </div>
               <Button variant="destructive" onClick={logout} className="touch-feedback shrink-0">
                 <LogOut className="h-4 w-4" />
-                Sign Out
+                {t('nav.signOut')}
               </Button>
             </div>
           </CardContent>

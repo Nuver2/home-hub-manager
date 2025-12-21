@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Home, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export default function Signup() {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -24,12 +27,12 @@ export default function Signup() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordTooShort'));
       return;
     }
 
@@ -40,11 +43,11 @@ export default function Signup() {
       if (error) {
         setError(error);
       } else {
-        toast.success('Account created successfully! Please sign in.');
+        toast.success(t('auth.accountCreated'));
         navigate('/login');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.');
+      setError(err.message || t('errors.generic'));
     } finally {
       setIsLoading(false);
     }
@@ -52,6 +55,11 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background p-4">
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher variant="compact" />
+      </div>
+
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         {/* Logo & Header */}
         <div className="text-center space-y-2">
@@ -60,16 +68,16 @@ export default function Signup() {
               <Home className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">HomeHub</h1>
-          <p className="text-muted-foreground">Create your admin account</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('app.name')}</h1>
+          <p className="text-muted-foreground">{t('auth.createAdminAccount')}</p>
         </div>
 
         {/* Signup Card */}
         <Card className="border-0 shadow-medium">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl">Sign up</CardTitle>
+            <CardTitle className="text-xl">{t('auth.signUp')}</CardTitle>
             <CardDescription>
-              Create your account to get started
+              {t('auth.createAccount')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -82,11 +90,11 @@ export default function Signup() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('auth.fullName')}</Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter your full name"
+                  placeholder={t('auth.enterName')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -94,11 +102,11 @@ export default function Signup() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t('auth.username')}</Label>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Choose a username"
+                  placeholder={t('auth.chooseUsername')}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -106,11 +114,11 @@ export default function Signup() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('auth.enterEmail')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -119,11 +127,11 @@ export default function Signup() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('auth.password')}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder={t('auth.createPassword')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -132,11 +140,11 @@ export default function Signup() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Confirm your password"
+                  placeholder={t('auth.confirmYourPassword')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -152,14 +160,14 @@ export default function Signup() {
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                Create Account
+                {t('auth.createAccount')}
               </Button>
             </form>
 
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              Already have an account?{' '}
+              {t('auth.alreadyHaveAccount')}{' '}
               <Link to="/login" className="text-accent hover:underline font-medium">
-                Sign in
+                {t('auth.signIn')}
               </Link>
             </div>
           </CardContent>
