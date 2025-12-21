@@ -1,7 +1,10 @@
+import { useCallback } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Pagination } from '@/components/Pagination';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import {
   Bell,
   Check,
@@ -14,6 +17,10 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks/useNotifications';
+import { usePagination } from '@/hooks/usePagination';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useQueryClient } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { formatRelativeTime } from '@/lib/date-utils';
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -27,11 +34,31 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export default function Notifications() {
+  const queryClient = useQueryClient();
   const { data: notifications = [], isLoading } = useNotifications();
   const markAsRead = useMarkNotificationRead();
   const markAllAsRead = useMarkAllNotificationsRead();
+  const isMobile = useIsMobile();
+
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts();
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Pagination
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    goToPage,
+    totalItems,
+    startIndex,
+    endIndex,
+  } = usePagination({ data: notifications, itemsPerPage: 15 });
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['notifications'] });
+  }, [queryClient]);
 
   const handleMarkAsRead = async (id: string) => {
     try {
@@ -70,38 +97,38 @@ export default function Notifications() {
     );
   }
 
-  return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl lg:text-3xl font-bold">Notifications</h1>
-              {unreadCount > 0 && (
-                <Badge variant="destructive">{unreadCount} new</Badge>
-              )}
-            </div>
-            <p className="text-muted-foreground mt-1">
-              Stay updated with your tasks and activities
-            </p>
+  const content = (
+    <div className="p-6 lg:p-8 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl lg:text-3xl font-bold">Notifications</h1>
+            {unreadCount > 0 && (
+              <Badge variant="destructive">{unreadCount} new</Badge>
+            )}
           </div>
-          {unreadCount > 0 && (
-            <Button 
-              variant="outline" 
-              onClick={handleMarkAllAsRead}
-              disabled={markAllAsRead.isPending}
-            >
-              <CheckCheck className="h-4 w-4" />
-              Mark all as read
-            </Button>
-          )}
+          <p className="text-muted-foreground mt-1">
+            Stay updated with your tasks and activities
+          </p>
         </div>
+        {unreadCount > 0 && (
+          <Button 
+            variant="outline" 
+            onClick={handleMarkAllAsRead}
+            disabled={markAllAsRead.isPending}
+          >
+            <CheckCheck className="h-4 w-4" />
+            Mark all as read
+          </Button>
+        )}
+      </div>
 
-        {/* Notifications List */}
-        {notifications.length > 0 ? (
+      {/* Notifications List */}
+      {paginatedData.length > 0 ? (
+        <>
           <div className="space-y-3">
-            {notifications.map((notification, index) => {
+            {paginatedData.map((notification, index) => {
               const Icon = typeIcons[notification.type] || Bell;
               
               return (
@@ -150,18 +177,44 @@ export default function Notifications() {
               );
             })}
           </div>
-        ) : (
-          <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
-            <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Bell className="h-7 w-7 text-muted-foreground" />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing {startIndex} to {endIndex} of {totalItems} notifications
+              </p>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+              />
             </div>
-            <h3 className="font-semibold text-lg mb-2">All caught up!</h3>
-            <p className="text-muted-foreground max-w-sm mx-auto">
-              You have no notifications right now. We'll let you know when something needs your attention.
-            </p>
+          )}
+        </>
+      ) : (
+        <div className="rounded-xl border bg-card p-12 text-center animate-fade-in">
+          <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+            <Bell className="h-7 w-7 text-muted-foreground" />
           </div>
-        )}
-      </div>
+          <h3 className="font-semibold text-lg mb-2">All caught up!</h3>
+          <p className="text-muted-foreground max-w-sm mx-auto">
+            You have no notifications right now. We'll let you know when something needs your attention.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <DashboardLayout>
+      {isMobile ? (
+        <PullToRefresh onRefresh={handleRefresh}>
+          {content}
+        </PullToRefresh>
+      ) : (
+        content
+      )}
     </DashboardLayout>
   );
 }
