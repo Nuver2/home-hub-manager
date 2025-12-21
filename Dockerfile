@@ -6,15 +6,9 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY bun.lockb* ./
 
-# Install dependencies
-# Try npm first, fallback to bun if available
-RUN if [ -f bun.lockb ]; then \
-      npm install -g bun && bun install --frozen-lockfile; \
-    else \
-      npm ci --legacy-peer-deps; \
-    fi
+# Install dependencies using npm
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
