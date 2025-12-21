@@ -54,24 +54,24 @@ async function createAdmin() {
   console.log('This script will create the first admin (parent) account.\n');
 
   // Get Supabase credentials from environment
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || env.VITE_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.VITE_SUPBASE_URL || env.VITE_SUPBASE_URL;
+  const supabaseServiceKey = process.env.SUPBASE_SERVICE_ROLE_KEY || env.SUPBASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl) {
-    console.error('❌ Error: VITE_SUPABASE_URL not found in environment variables');
+    console.error('❌ Error: VITE_SUPBASE_URL not found in environment variables');
     console.error('Please set it in your .env file or export it before running this script.');
     process.exit(1);
   }
 
   if (!supabaseServiceKey) {
-    console.error('❌ Error: SUPABASE_SERVICE_ROLE_KEY not found in environment variables');
+    console.error('❌ Error: SUPBASE_SERVICE_ROLE_KEY not found in environment variables');
     console.error('\n📝 To fix this:');
     console.error('1. Go to your Supabase dashboard: https://supabase.com/dashboard');
     console.error('2. Select your project');
     console.error('3. Go to: Settings → API');
     console.error('4. Find the "service_role" key (it\'s a secret key, different from the anon key)');
     console.error('5. Add it to your .env file:');
-    console.error('   SUPABASE_SERVICE_ROLE_KEY="your-service-role-key-here"');
+    console.error('   SUPBASE_SERVICE_ROLE_KEY="your-service-role-key-here"');
     console.error('\n⚠️  Keep this key secret! Never commit it to git.\n');
     process.exit(1);
   }

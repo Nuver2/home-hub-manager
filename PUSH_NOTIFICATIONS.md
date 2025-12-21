@@ -29,7 +29,7 @@ This will:
 Make sure your `.env` has:
 ```
 VITE_VAPID_PUBLIC_KEY="your-public-key-here"
-SUPABASE_VAPID_PRIVATE_KEY="your-private-key-here"
+SUPBASE_VAPID_PRIVATE_KEY="your-private-key-here"
 ```
 
 ⚠️ **Keep the private key SECRET!** Never commit it to git.

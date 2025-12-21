@@ -2,14 +2,14 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPBASE_URL = import.meta.env.VITE_SUPBASE_URL;
+const SUPBASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPBASE_PUBLISHABLE_KEY;
 
 // Validate environment variables
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+if (!SUPBASE_URL || !SUPBASE_PUBLISHABLE_KEY) {
   const missing = [];
-  if (!SUPABASE_URL) missing.push('VITE_SUPABASE_URL');
-  if (!SUPABASE_PUBLISHABLE_KEY) missing.push('VITE_SUPABASE_PUBLISHABLE_KEY');
+  if (!SUPBASE_URL) missing.push('VITE_SUPBASE_URL');
+  if (!SUPBASE_PUBLISHABLE_KEY) missing.push('VITE_SUPBASE_PUBLISHABLE_KEY');
   
   console.error('❌ Missing Supabase environment variables:', missing.join(', '));
   console.error('Please set these variables in Railway: Variables tab → Add Variable');
@@ -22,8 +22,8 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(
-  SUPABASE_URL || 'https://placeholder.supabase.co',
-  SUPABASE_PUBLISHABLE_KEY || 'placeholder-key',
+  SUPBASE_URL || 'https://placeholder.supabase.co',
+  SUPBASE_PUBLISHABLE_KEY || 'placeholder-key',
   {
     auth: {
       storage: localStorage,

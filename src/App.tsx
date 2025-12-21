@@ -224,8 +224,8 @@ function AppRoutes() {
 }
 
 // Check for required environment variables
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPBASE_URL = import.meta.env.VITE_SUPBASE_URL;
+const SUPBASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPBASE_PUBLISHABLE_KEY;
 
 const MissingEnvVars = () => (
   <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -240,8 +240,8 @@ const MissingEnvVars = () => (
         Missing required environment variables. Please set the following in Railway:
       </p>
       <div className="bg-secondary p-4 rounded-lg text-left space-y-2 font-mono text-sm">
-        {!SUPABASE_URL && <div className="text-destructive">✗ VITE_SUPABASE_URL</div>}
-        {!SUPABASE_PUBLISHABLE_KEY && <div className="text-destructive">✗ VITE_SUPABASE_PUBLISHABLE_KEY</div>}
+        {!SUPBASE_URL && <div className="text-destructive">✗ VITE_SUPBASE_URL</div>}
+        {!SUPBASE_PUBLISHABLE_KEY && <div className="text-destructive">✗ VITE_SUPBASE_PUBLISHABLE_KEY</div>}
       </div>
       <p className="text-sm text-muted-foreground">
         Go to Railway Dashboard → Your Project → Variables → Add Variable
@@ -252,7 +252,7 @@ const MissingEnvVars = () => (
 
 const App = () => {
   // Show error if environment variables are missing
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  if (!SUPBASE_URL || !SUPBASE_PUBLISHABLE_KEY) {
     return <MissingEnvVars />;
   }
 

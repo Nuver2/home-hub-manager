@@ -72,6 +72,10 @@ export default function StaffForm() {
       });
 
       if (response.error) {
+        // Check if it's a 404 (function not deployed)
+        if (response.error.message?.includes('404') || response.error.message?.includes('not found')) {
+          throw new Error('Edge Function not deployed. Please deploy the "create-user" function to Supabase. See DEPLOY_EDGE_FUNCTION.md for instructions.');
+        }
         throw new Error(response.error.message);
       }
 
@@ -83,7 +87,10 @@ export default function StaffForm() {
       navigate('/staff');
     } catch (error: any) {
       console.error('Error creating staff:', error);
-      toast.error(error.message || 'Failed to create staff member');
+      const errorMessage = error.message || 'Failed to create staff member';
+      toast.error(errorMessage, {
+        duration: errorMessage.includes('not deployed') ? 10000 : 5000, // Longer duration for deployment errors
+      });
     } finally {
       setIsLoading(false);
     }

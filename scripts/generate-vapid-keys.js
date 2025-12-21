@@ -101,7 +101,7 @@ try {
   console.log('✅ VAPID keys generated!\n');
   console.log('📋 Add these to your .env file:\n');
   console.log(`VITE_VAPID_PUBLIC_KEY="${publicKey}"`);
-  console.log(`SUPABASE_VAPID_PRIVATE_KEY="${privateKey}"\n`);
+  console.log(`SUPBASE_VAPID_PRIVATE_KEY="${privateKey}"\n`);
   console.log('⚠️  Keep the private key SECRET! Never commit it to git.\n');
 
   // Try to update .env file
@@ -125,7 +125,7 @@ try {
         '',
         '# VAPID Keys for Web Push Notifications',
         `VITE_VAPID_PUBLIC_KEY="${publicKey}"`,
-        `SUPABASE_VAPID_PRIVATE_KEY="${privateKey}"`,
+        `SUPBASE_VAPID_PRIVATE_KEY="${privateKey}"`,
       ];
       
       writeFileSync(envPath, envContent + '\n' + newLines.join('\n') + '\n', 'utf-8');

@@ -88,11 +88,11 @@ docker-compose up
 1. Connect your GitHub repository to Railway
 2. Railway will automatically detect the Dockerfile
 3. Set your environment variables in Railway dashboard:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_PUBLISHABLE_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (if needed)
+   - `VITE_SUPBASE_URL`
+   - `VITE_SUPBASE_PUBLISHABLE_KEY`
+   - `SUPBASE_SERVICE_ROLE_KEY` (if needed)
    - `VITE_VAPID_PUBLIC_KEY` (for push notifications)
-   - `SUPABASE_VAPID_PRIVATE_KEY` (for push notifications)
+   - `SUPBASE_VAPID_PRIVATE_KEY` (for push notifications)
 4. Railway will build and deploy automatically
 
 #### Deploy to other platforms:

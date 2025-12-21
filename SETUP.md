@@ -22,7 +22,7 @@
 3. Copy it
 4. Add this line to your `.env` file:
    ```
-   SUPABASE_SERVICE_ROLE_KEY="your-service-role-key-here"
+   SUPBASE_SERVICE_ROLE_KEY="your-service-role-key-here"
    ```
 
 ### Step 3: Create Admin Account
@@ -47,7 +47,7 @@ Enter:
 ### "Could not find the table 'public.profiles'"
 → You haven't run Step 1 yet. Run the SQL setup first!
 
-### "SUPABASE_SERVICE_ROLE_KEY not found"
+### "SUPBASE_SERVICE_ROLE_KEY not found"
 → You haven't added the service role key to your `.env` file. Do Step 2.
 
 ### "Email already exists"
@@ -74,7 +74,7 @@ To enable browser push notifications:
    The script will automatically add them, or add manually:
    ```
    VITE_VAPID_PUBLIC_KEY="your-public-key"
-   SUPABASE_VAPID_PRIVATE_KEY="your-private-key"
+   SUPBASE_VAPID_PRIVATE_KEY="your-private-key"
    ```
 
 3. **Enable in Settings:**
