@@ -13,6 +13,17 @@ RUN npm ci --legacy-peer-deps
 # Copy source code
 COPY . .
 
+# Accept build arguments for environment variables
+# Railway automatically passes environment variables, but we need to explicitly accept them
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ARG VITE_VAPID_PUBLIC_KEY
+
+# Set as environment variables for the build
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+ENV VITE_VAPID_PUBLIC_KEY=$VITE_VAPID_PUBLIC_KEY
+
 # Build the application
 RUN npm run build
 
