@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { useTask, useUpdateTask, useDeleteTask } from '@/hooks/useTasks';
 import { TaskStatus } from '@/types/database';
 import { Comments } from '@/components/Comments';
+import { useTranslation } from 'react-i18next';
 
 const priorityVariants: Record<string, 'priority-low' | 'priority-medium' | 'priority-high' | 'priority-urgent'> = {
   low: 'priority-low',
@@ -58,6 +59,7 @@ const categoryIcons: Record<string, string> = {
 };
 
 export default function TaskDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -170,10 +172,10 @@ export default function TaskDetail() {
                 </p>
                 {task.attachments && task.attachments.length > 0 && (
                   <div className="pt-4 border-t">
-                    <p className="text-sm font-medium mb-2">Attachments ({task.attachments.length})</p>
+                    <p className="text-sm font-medium mb-2">{t('attachments.title')} ({task.attachments.length})</p>
                     <div className="space-y-2">
                       {task.attachments.map((url, index) => {
-                        const fileName = url.split('/').pop() || `Attachment ${index + 1}`;
+                        const fileName = url.split('/').pop() || `${t('attachments.attachment')} ${index + 1}`;
                         const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
                         
                         return (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import {
   Plus,
@@ -19,6 +20,7 @@ interface QuickAction {
 }
 
 export function FloatingActionButton() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,19 +33,19 @@ export function FloatingActionButton() {
 
   if (isParent) {
     actions.push(
-      { label: 'New Task', href: '/tasks/new', icon: CheckSquare, color: 'bg-info text-info-foreground' },
-      { label: 'New List', href: '/shopping-lists/new', icon: ShoppingCart, color: 'bg-accent text-accent-foreground' },
-      { label: 'Add Staff', href: '/staff/new', icon: Users, color: 'bg-success text-success-foreground' },
-      { label: 'New Project', href: '/projects/new', icon: FolderKanban, color: 'bg-warning text-warning-foreground' }
+      { label: t('mobile.newTask'), href: '/tasks/new', icon: CheckSquare, color: 'bg-info text-info-foreground' },
+      { label: t('mobile.newList'), href: '/shopping-lists/new', icon: ShoppingCart, color: 'bg-accent text-accent-foreground' },
+      { label: t('mobile.addStaff'), href: '/staff/new', icon: Users, color: 'bg-success text-success-foreground' },
+      { label: t('mobile.newProject'), href: '/projects/new', icon: FolderKanban, color: 'bg-warning text-warning-foreground' }
     );
   } else if (isChef) {
     actions.push(
-      { label: 'New List', href: '/shopping-lists/new', icon: ShoppingCart, color: 'bg-accent text-accent-foreground' }
+      { label: t('mobile.newList'), href: '/shopping-lists/new', icon: ShoppingCart, color: 'bg-accent text-accent-foreground' }
     );
   }
 
   return (
-    <div className="fixed bottom-[5rem] right-4 z-[60] lg:hidden">
+    <div className="fixed bottom-[6.5rem] right-4 z-[35] lg:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}>
       {/* Action buttons */}
       <div className={cn(
         "absolute bottom-16 right-0 flex flex-col-reverse gap-2 transition-all duration-150",
@@ -92,7 +94,7 @@ export function FloatingActionButton() {
       {/* Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-background/60 backdrop-blur-[2px] -z-10"
+          className="fixed inset-0 bg-background/60 backdrop-blur-[2px] z-[30]"
           onClick={() => setIsOpen(false)}
         />
       )}

@@ -31,6 +31,7 @@ import { ShoppingListStatus, ItemStatus } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { Comments } from '@/components/Comments';
 import { ShoppingListItemCard } from '@/components/ShoppingListItemCard';
+import { useTranslation } from 'react-i18next';
 
 const priorityVariants: Record<string, 'priority-low' | 'priority-medium' | 'priority-high' | 'priority-urgent'> = {
   low: 'priority-low',
@@ -67,6 +68,7 @@ const itemStatusIcons: Record<string, React.ReactNode> = {
 };
 
 export default function ShoppingListDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();

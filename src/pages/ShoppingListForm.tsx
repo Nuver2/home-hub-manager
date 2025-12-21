@@ -21,6 +21,7 @@ import { useStaff } from '@/hooks/useStaff';
 import { useProjects } from '@/hooks/useProjects';
 import { useShoppingListTemplates } from '@/hooks/useShoppingListTemplates';
 import { TaskPriority } from '@/types/database';
+import { useTranslation } from 'react-i18next';
 
 interface ItemInput {
   name: string;
@@ -29,6 +30,7 @@ interface ItemInput {
 }
 
 export default function ShoppingListForm() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -187,12 +189,12 @@ export default function ShoppingListForm() {
           {!isEditing && templates.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Use Template</CardTitle>
+                <CardTitle>{t('shoppingList.loadFromTemplate')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Select onValueChange={loadTemplate}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a template to load items..." />
+                    <SelectValue placeholder={t('shoppingList.selectTemplate')} />
                   </SelectTrigger>
                   <SelectContent>
                     {templates.map(template => (
@@ -226,12 +228,12 @@ export default function ShoppingListForm() {
 
               {/* Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes">{t('shoppingList.notes')}</Label>
                 <Textarea
                   id="notes"
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="Additional notes..."
+                  placeholder={t('shoppingList.additionalNotes')}
                   rows={3}
                 />
               </div>
@@ -275,7 +277,7 @@ export default function ShoppingListForm() {
                   onValueChange={(value) => setFormData(prev => ({ ...prev, assigned_to: value === 'none' ? '' : value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a driver" />
+                    <SelectValue placeholder={t('shoppingList.selectDriver')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Not Assigned</SelectItem>

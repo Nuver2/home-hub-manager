@@ -10,6 +10,7 @@ import { formatRelativeTime } from '@/lib/date-utils';
 import { toast } from 'sonner';
 import { MessageSquare, Send, Trash2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface CommentsProps {
   taskId?: string;
@@ -17,6 +18,7 @@ interface CommentsProps {
 }
 
 export function Comments({ taskId, shoppingListId }: CommentsProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: comments = [], isLoading } = useComments(taskId, shoppingListId);
   const createComment = useCreateComment();
@@ -28,7 +30,7 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
     e.preventDefault();
     
     if (!newComment.trim() && commentAttachments.length === 0) {
-      toast.error('Comment or attachment is required');
+      toast.error(t('comments.commentRequired'));
       return;
     }
 
@@ -41,20 +43,20 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
       });
       setNewComment('');
       setCommentAttachments([]);
-      toast.success('Comment added');
+      toast.success(t('success.commentAdded'));
     } catch (error: any) {
-      toast.error(error.message || 'Failed to add comment');
+      toast.error(error.message || t('errors.failedAddComment'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
+    if (!confirm(t('comments.deleteConfirm'))) return;
     
     try {
       await deleteComment.mutateAsync(id);
-      toast.success('Comment deleted');
+      toast.success(t('success.commentDeleted'));
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete comment');
+      toast.error(error.message || t('errors.failedDeleteComment'));
     }
   };
 
@@ -63,7 +65,7 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5" />
-          Comments ({comments.length})
+          {t('comments.title')} ({comments.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -94,7 +96,7 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="font-medium text-sm">
-                        {comment.userProfile?.name || 'Unknown User'}
+                        {comment.userProfile?.name || t('comments.unknownUser')}
                       </p>
                       <span className="text-xs text-muted-foreground">
                         {formatRelativeTime(comment.created_at)}
@@ -113,7 +115,7 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
                             rel="noopener noreferrer"
                             className="text-xs text-accent hover:underline"
                           >
-                            Attachment {idx + 1}
+                            {t('attachments.attachment')} {idx + 1}
                           </a>
                         ))}
                       </div>
@@ -136,7 +138,7 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No comments yet. Be the first to comment!</p>
+              <p className="text-sm">{t('comments.beFirst')}</p>
             </div>
           )}
         </div>
@@ -144,7 +146,7 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
         {/* Add Comment Form */}
         <form onSubmit={handleSubmit} className="space-y-3">
           <Textarea
-            placeholder="Add a comment..."
+            placeholder={t('comments.writeComment')}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             className="min-h-[80px] resize-none"
@@ -168,12 +170,12 @@ export function Comments({ taskId, shoppingListId }: CommentsProps) {
               {createComment.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Posting...
+                  {t('comments.posting')}
                 </>
               ) : (
                 <>
                   <Send className="h-4 w-4 mr-2" />
-                  Post Comment
+                  {t('comments.postComment')}
                 </>
               )}
             </Button>

@@ -106,18 +106,38 @@ export function useCreateTask() {
       project_id?: string;
       assigned_user_ids?: string[];
       attachments?: string[];
+      is_recurring?: boolean;
+      recurrence_pattern?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+      recurrence_interval?: number;
+      recurrence_end_date?: string;
     }) => {
       const { assigned_user_ids, ...taskData } = task;
       
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Prepare task data, only include recurring fields if is_recurring is true
+      const insertData: any = {
+        ...taskData,
+        created_by: user?.id,
+      };
+      
+      // Only include recurring fields if task is recurring
+      if (!insertData.is_recurring) {
+        delete insertData.recurrence_pattern;
+        delete insertData.recurrence_interval;
+        delete insertData.recurrence_end_date;
+      }
+      
       const { data, error } = await supabase
         .from('tasks')
-        .insert({ ...taskData, created_by: user?.id })
+        .insert(insertData)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Task creation error:', error);
+        throw error;
+      }
       
       // Create task assignments
       if (assigned_user_ids && assigned_user_ids.length > 0) {
@@ -141,15 +161,44 @@ export function useUpdateTask() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, assigned_user_ids, ...updates }: Partial<Task> & { id: string; assigned_user_ids?: string[] }) => {
+    mutationFn: async ({ id, assigned_user_ids, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_date, ...updates }: Partial<Task> & { 
+      id: string; 
+      assigned_user_ids?: string[];
+      is_recurring?: boolean;
+      recurrence_pattern?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+      recurrence_interval?: number;
+      recurrence_end_date?: string;
+    }) => {
+      // Prepare update data, only include recurring fields if is_recurring is true
+      const updateData: any = { ...updates };
+      
+      if (is_recurring !== undefined) {
+        updateData.is_recurring = is_recurring;
+      }
+      
+      // Only include recurring fields if task is recurring
+      if (is_recurring) {
+        if (recurrence_pattern !== undefined) updateData.recurrence_pattern = recurrence_pattern;
+        if (recurrence_interval !== undefined) updateData.recurrence_interval = recurrence_interval;
+        if (recurrence_end_date !== undefined) updateData.recurrence_end_date = recurrence_end_date;
+      } else {
+        // Clear recurring fields if task is not recurring
+        updateData.recurrence_pattern = null;
+        updateData.recurrence_interval = null;
+        updateData.recurrence_end_date = null;
+      }
+      
       const { data, error } = await supabase
         .from('tasks')
-        .update(updates)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Task update error:', error);
+        throw error;
+      }
       
       // Update assignments if provided
       if (assigned_user_ids !== undefined) {

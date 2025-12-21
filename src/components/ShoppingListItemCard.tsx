@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/FileUpload';
 import { AlertCircle, Check, X, Package, ChevronDown, ChevronUp, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface ShoppingListItemCardProps {
   item: ShoppingListItem;
@@ -22,6 +23,7 @@ const itemStatusIcons: Record<string, React.ReactNode> = {
 };
 
 export function ShoppingListItemCard({ item, canUpdate, onStatusChange, onUpdate }: ShoppingListItemCardProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [comment, setComment] = useState(item.driver_comment || '');
   const [isUpdating, setIsUpdating] = useState(false);
@@ -72,7 +74,7 @@ export function ShoppingListItemCard({ item, canUpdate, onStatusChange, onUpdate
               className="inline-flex items-center gap-1 text-xs text-accent hover:underline mt-1"
             >
               <ImageIcon className="h-3 w-3" />
-              View attachment
+              {t('attachments.viewAttachment')}
             </a>
           )}
         </div>
@@ -86,10 +88,10 @@ export function ShoppingListItemCard({ item, canUpdate, onStatusChange, onUpdate
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="found">Found</SelectItem>
-                <SelectItem value="not_found">Not Found</SelectItem>
-                <SelectItem value="alternative">Alternative</SelectItem>
+                <SelectItem value="pending">{t('status.pending')}</SelectItem>
+                <SelectItem value="found">{t('shoppingList.found', 'Найдено')}</SelectItem>
+                <SelectItem value="not_found">{t('shoppingList.notFound', 'Не найдено')}</SelectItem>
+                <SelectItem value="alternative">{t('shoppingList.alternative', 'Альтернатива')}</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -112,11 +114,11 @@ export function ShoppingListItemCard({ item, canUpdate, onStatusChange, onUpdate
         <div className="border-t p-4 space-y-4 bg-secondary/30">
           {/* Driver Comment */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Driver Comment</label>
+            <label className="text-sm font-medium">{t('shoppingList.driverComment')}</label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Add a comment about this item..."
+              placeholder={t('shoppingList.addDriverNote')}
               rows={3}
             />
             <Button
@@ -124,13 +126,13 @@ export function ShoppingListItemCard({ item, canUpdate, onStatusChange, onUpdate
               onClick={handleSaveComment}
               disabled={isUpdating || comment === (item.driver_comment || '')}
             >
-              Save Comment
+              {t('shoppingList.saveNote')}
             </Button>
           </div>
 
           {/* Attachment */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Attachment</label>
+            <label className="text-sm font-medium">{t('attachments.title')}</label>
             <FileUpload
               bucket="attachments"
               folder="shopping-items"
@@ -148,7 +150,7 @@ export function ShoppingListItemCard({ item, canUpdate, onStatusChange, onUpdate
       {!isExpanded && item.driver_comment && (
         <div className="px-3 pb-3 border-t bg-secondary/30">
           <p className="text-sm text-warning mt-2">
-            <strong>Note:</strong> {item.driver_comment}
+            <strong>{t('shoppingList.note')}:</strong> {item.driver_comment}
           </p>
         </div>
       )}

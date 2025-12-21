@@ -5,6 +5,7 @@ import { useFileUpload } from '@/hooks/useFileUpload';
 import { Upload, X, File, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface FileUploadProps {
   bucket: string;
@@ -29,6 +30,7 @@ export function FileUpload({
   accept = 'image/*,.pdf,.doc,.docx',
   className,
 }: FileUploadProps) {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFile, deleteFile, isUploading, uploadProgress } = useFileUpload();
   const [uploadingFiles, setUploadingFiles] = useState<string[]>([]);
@@ -40,14 +42,14 @@ export function FileUpload({
 
     // Check total files limit
     if (existingFiles.length + files.length > maxFiles) {
-      toast.error(`Maximum ${maxFiles} files allowed`);
+      toast.error(t('attachments.maxFilesAllowed', { count: maxFiles }));
       return;
     }
 
     // Validate file sizes
     for (const file of files) {
       if (file.size > maxSizeMB * 1024 * 1024) {
-        toast.error(`${file.name} exceeds ${maxSizeMB}MB limit`);
+        toast.error(t('attachments.fileExceedsLimit', { name: file.name, size: maxSizeMB }));
         return;
       }
     }
@@ -120,12 +122,12 @@ export function FileUpload({
           {isUploading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              Uploading...
+              {t('attachments.uploading')}
             </>
           ) : (
             <>
               <Upload className="h-4 w-4 mr-2" />
-              Upload Files ({existingFiles.length}/{maxFiles})
+              {t('attachments.uploadFiles')} ({existingFiles.length}/{maxFiles})
             </>
           )}
         </Button>
@@ -133,7 +135,7 @@ export function FileUpload({
           <Progress value={uploadProgress} className="mt-2" />
         )}
         <p className="text-xs text-muted-foreground mt-1">
-          Max {maxSizeMB}MB per file. Accepted: images, PDF, documents
+          {t('attachments.maxSizePerFile', { size: maxSizeMB })}
         </p>
       </div>
 

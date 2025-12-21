@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnreadNotificationsCount } from '@/hooks/useNotifications';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   CheckSquare,
@@ -19,16 +20,17 @@ interface NavItem {
 }
 
 export function MobileBottomNav() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
   const { data: unreadCount = 0 } = useUnreadNotificationsCount();
 
   const navItems: NavItem[] = [
-    { label: 'Home', href: '/dashboard', icon: LayoutDashboard },
-    { label: 'Tasks', href: '/tasks', icon: CheckSquare },
-    { label: 'Shopping', href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
-    { label: 'Alerts', href: '/notifications', icon: BellRing, badge: unreadCount },
-    { label: 'Settings', href: '/settings', icon: Settings },
+    { label: t('mobile.home'), href: '/dashboard', icon: LayoutDashboard },
+    { label: t('mobile.tasks'), href: '/tasks', icon: CheckSquare },
+    { label: t('mobile.shopping'), href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
+    { label: t('mobile.alerts'), href: '/notifications', icon: BellRing, badge: unreadCount },
+    { label: t('mobile.settings'), href: '/settings', icon: Settings },
   ];
 
   const filteredItems = navItems.filter(item => {
@@ -39,12 +41,12 @@ export function MobileBottomNav() {
   const displayItems = filteredItems.slice(0, 5);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
       {/* Gradient fade effect */}
       <div className="absolute inset-x-0 -top-4 h-4 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       
       {/* Nav bar */}
-      <div className="bg-card/98 backdrop-blur-lg border-t border-border/50 px-1 pb-safe shadow-lg">
+      <div className="bg-card/98 backdrop-blur-lg border-t border-border/50 px-1 pb-safe pt-1 shadow-lg min-h-[64px]">
         <div className="flex items-center justify-around">
           {displayItems.map((item) => {
             const isActive = location.pathname === item.href || 

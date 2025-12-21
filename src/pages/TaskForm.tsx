@@ -23,8 +23,10 @@ import { useStaff } from '@/hooks/useStaff';
 import { useProjects } from '@/hooks/useProjects';
 import { TaskPriority, TaskStatus, TaskCategory } from '@/types/database';
 import { FileUpload } from '@/components/FileUpload';
+import { useTranslation } from 'react-i18next';
 
 export default function TaskForm() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -83,7 +85,7 @@ export default function TaskForm() {
     e.preventDefault();
     
     if (!formData.title.trim()) {
-      toast.error('Title is required');
+      toast.error(t('task.titleRequired'));
       return;
     }
 
@@ -113,8 +115,10 @@ export default function TaskForm() {
         toast.success('Task created successfully');
       }
       navigate('/tasks');
-    } catch (error) {
-      toast.error(isEditing ? 'Failed to update task' : 'Failed to create task');
+    } catch (error: any) {
+      console.error('Task form error:', error);
+      const errorMessage = error?.message || error?.error_description || (isEditing ? 'Failed to update task' : 'Failed to create task');
+      toast.error(errorMessage);
     }
   };
 
@@ -153,29 +157,29 @@ export default function TaskForm() {
         <form onSubmit={handleSubmit}>
           <Card>
             <CardHeader>
-              <CardTitle>Task Details</CardTitle>
+              <CardTitle>{t('task.taskDetails')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
+                <Label htmlFor="title">{t('task.title')} *</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Enter task title"
+                  placeholder={t('task.enterTitle')}
                   required
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('task.description')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Enter task description"
+                  placeholder={t('task.enterDescription')}
                   rows={4}
                 />
               </div>
@@ -183,7 +187,7 @@ export default function TaskForm() {
               {/* Priority, Status, Category */}
               <div className="grid sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Priority</Label>
+                  <Label>{t('task.priority')}</Label>
                   <Select
                     value={formData.priority}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value as TaskPriority }))}
@@ -192,16 +196,16 @@ export default function TaskForm() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
+                      <SelectItem value="low">{t('priority.low')}</SelectItem>
+                      <SelectItem value="medium">{t('priority.medium')}</SelectItem>
+                      <SelectItem value="high">{t('priority.high')}</SelectItem>
+                      <SelectItem value="urgent">{t('priority.urgent')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Status</Label>
+                  <Label>{t('task.status')}</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as TaskStatus }))}
@@ -210,16 +214,16 @@ export default function TaskForm() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="to_do">To Do</SelectItem>
-                      <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="on_hold">On Hold</SelectItem>
+                      <SelectItem value="to_do">{t('status.toDo')}</SelectItem>
+                      <SelectItem value="in_progress">{t('status.inProgress')}</SelectItem>
+                      <SelectItem value="completed">{t('status.completed')}</SelectItem>
+                      <SelectItem value="on_hold">{t('status.onHold')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Category</Label>
+                  <Label>{t('task.category')}</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, category: value as TaskCategory }))}
@@ -228,12 +232,12 @@ export default function TaskForm() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cleaning">Cleaning</SelectItem>
-                      <SelectItem value="kitchen">Kitchen</SelectItem>
-                      <SelectItem value="driving">Driving</SelectItem>
-                      <SelectItem value="shopping">Shopping</SelectItem>
-                      <SelectItem value="maintenance">Maintenance</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="cleaning">{t('category.cleaning')}</SelectItem>
+                      <SelectItem value="kitchen">{t('category.kitchen')}</SelectItem>
+                      <SelectItem value="driving">{t('category.driving')}</SelectItem>
+                      <SelectItem value="shopping">{t('category.shopping')}</SelectItem>
+                      <SelectItem value="maintenance">{t('category.maintenance')}</SelectItem>
+                      <SelectItem value="other">{t('category.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -242,7 +246,7 @@ export default function TaskForm() {
               {/* Due Date, Location */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="due_date">Due Date</Label>
+                  <Label htmlFor="due_date">{t('task.dueDate')}</Label>
                   <Input
                     id="due_date"
                     type="date"
@@ -252,28 +256,28 @@ export default function TaskForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">{t('task.location')}</Label>
                   <Input
                     id="location"
                     value={formData.location}
                     onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="Enter location"
+                    placeholder={t('task.enterLocation')}
                   />
                 </div>
               </div>
 
               {/* Project */}
               <div className="space-y-2">
-                <Label>Project (Optional)</Label>
+                <Label>{t('task.projectOptional')}</Label>
                 <Select
                   value={formData.project_id}
                   onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value === 'none' ? '' : value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a project" />
+                    <SelectValue placeholder={t('task.selectProject')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">No Project</SelectItem>
+                    <SelectItem value="none">{t('task.noProject')}</SelectItem>
                     {projects.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.title}
@@ -285,7 +289,7 @@ export default function TaskForm() {
 
               {/* Assign Staff */}
               <div className="space-y-2">
-                <Label>Assign Staff</Label>
+                <Label>{t('task.assignedUsers')}</Label>
                 <div className="grid sm:grid-cols-2 gap-2 p-4 border rounded-lg">
                   {staff.length > 0 ? (
                     staff.map((member) => (
@@ -304,14 +308,14 @@ export default function TaskForm() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground col-span-2">No staff members available</p>
+                    <p className="text-sm text-muted-foreground col-span-2">{t('staff.noStaffFound')}</p>
                   )}
                 </div>
               </div>
 
               {/* Attachments */}
               <div className="space-y-2">
-                <Label>Attachments</Label>
+                <Label>{t('attachments.title')}</Label>
                 <FileUpload
                   bucket="attachments"
                   folder="tasks"
@@ -337,8 +341,8 @@ export default function TaskForm() {
               <div className="space-y-4 p-4 border rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Recurring Task</Label>
-                    <p className="text-sm text-muted-foreground">Create this task on a schedule</p>
+                    <Label>{t('task.recurringTask')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('task.recurringDescription', 'Создать эту задачу по расписанию')}</p>
                   </div>
                   <Switch
                     checked={formData.is_recurring}
@@ -349,7 +353,7 @@ export default function TaskForm() {
                   <div className="space-y-4 pt-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label>Repeat Every</Label>
+                        <Label>{t('task.recurrenceInterval', 'Повторять каждые')}</Label>
                         <div className="flex items-center gap-2">
                           <Input
                             type="number"
@@ -366,16 +370,16 @@ export default function TaskForm() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="daily">Day(s)</SelectItem>
-                              <SelectItem value="weekly">Week(s)</SelectItem>
-                              <SelectItem value="monthly">Month(s)</SelectItem>
-                              <SelectItem value="yearly">Year(s)</SelectItem>
+                              <SelectItem value="daily">{t('task.daily')}</SelectItem>
+                              <SelectItem value="weekly">{t('task.weekly')}</SelectItem>
+                              <SelectItem value="monthly">{t('task.monthly')}</SelectItem>
+                              <SelectItem value="yearly">{t('task.yearly')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label>End Date (Optional)</Label>
+                        <Label>{t('task.recurrenceEndDate')} ({t('common.optional', 'Необязательно')})</Label>
                         <Input
                           type="date"
                           value={formData.recurrence_end_date}
