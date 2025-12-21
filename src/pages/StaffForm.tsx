@@ -76,11 +76,20 @@ export default function StaffForm() {
         if (response.error.message?.includes('404') || response.error.message?.includes('not found')) {
           throw new Error('Edge Function not deployed. Please deploy the "create-user" function to Supabase. See DEPLOY_EDGE_FUNCTION.md for instructions.');
         }
-        throw new Error(response.error.message);
+        // Try to extract error message from response
+        const errorMsg = response.error.message || response.error.context?.msg || 'Unknown error';
+        throw new Error(errorMsg);
       }
 
-      if (response.data?.error) {
-        throw new Error(response.data.error);
+      // Check if response.data contains an error
+      if (response.data && typeof response.data === 'object' && 'error' in response.data) {
+        throw new Error(response.data.error as string);
+      }
+
+      // Check if response itself indicates an error
+      if (!response.data || (typeof response.data === 'object' && !('success' in response.data))) {
+        console.error('Unexpected response format:', response);
+        throw new Error('Unexpected response from server');
       }
 
       toast.success('Staff member added successfully');
