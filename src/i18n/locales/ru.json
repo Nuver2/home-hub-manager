@@ -112,7 +112,9 @@
     "returnedForFix": "Возвращено на доработку",
     "pending": "Ожидает",
     "approved": "Одобрено",
-    "rejected": "Отклонено"
+    "rejected": "Отклонено",
+    "active": "Активный",
+    "inactive": "Неактивный"
   },
   "priority": {
     "all": "Все приоритеты",

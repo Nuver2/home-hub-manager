@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StaffCard } from '@/components/staff/StaffCard';
@@ -23,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { useStaff } from '@/hooks/useStaff';
 
 export default function Staff() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: staffMembers = [], isLoading } = useStaff();
   const [search, setSearch] = useState('');
@@ -44,11 +46,11 @@ export default function Staff() {
   });
 
   const roleTabs = [
-    { value: 'all', label: 'All Staff' },
-    { value: 'driver', label: 'Drivers' },
-    { value: 'chef', label: 'Chefs' },
-    { value: 'cleaner', label: 'Cleaners' },
-    { value: 'other', label: 'Other' },
+    { value: 'all', label: t('staff.allStaff') },
+    { value: 'driver', label: t('staff.drivers') },
+    { value: 'chef', label: t('staff.chefs') },
+    { value: 'cleaner', label: t('staff.cleaners') },
+    { value: 'other', label: t('staff.other') },
   ];
 
   if (isLoading) {
@@ -82,15 +84,15 @@ export default function Staff() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold">Staff Management</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold">{t('staff.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Manage your household staff members
+              {t('staff.manage')}
             </p>
           </div>
           <Link to="/staff/new">
             <Button variant="accent">
               <Plus className="h-4 w-4" />
-              Add Staff
+              {t('staff.addStaff')}
             </Button>
           </Link>
         </div>
@@ -134,7 +136,7 @@ export default function Staff() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search staff..."
+              placeholder={t('staff.searchStaff')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 h-11"
@@ -142,12 +144,12 @@ export default function Staff() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('status.all')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="all">{t('status.all')}</SelectItem>
+              <SelectItem value="active">{t('status.active')}</SelectItem>
+              <SelectItem value="inactive">{t('status.inactive')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -166,16 +168,16 @@ export default function Staff() {
             <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
               <Users className="h-7 w-7 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">No staff members found</h3>
+            <h3 className="font-semibold text-lg mb-2">{t('staff.noStaffFound')}</h3>
             <p className="text-muted-foreground mb-4">
               {search || roleFilter !== 'all' || statusFilter !== 'all'
-                ? 'Try adjusting your filters'
-                : 'Get started by adding your first staff member'}
+                ? t('staff.adjustFilters')
+                : t('staff.addFirst')}
             </p>
             <Link to="/staff/new">
               <Button variant="accent">
                 <Plus className="h-4 w-4" />
-                Add Staff Member
+                {t('staff.addMember')}
               </Button>
             </Link>
           </div>

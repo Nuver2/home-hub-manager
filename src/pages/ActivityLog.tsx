@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Input } from '@/components/ui/input';
@@ -46,6 +47,7 @@ const actionColors: Record<string, string> = {
 };
 
 export default function ActivityLog() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: activities = [], isLoading } = useActivityLog();
@@ -113,9 +115,9 @@ export default function ActivityLog() {
     <div className="p-6 lg:p-8 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold">Activity Log</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold">{t('activity.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          Track all actions and changes in the system
+          {t('activity.trackAll')}
         </p>
       </div>
 
@@ -124,7 +126,7 @@ export default function ActivityLog() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search activities..."
+            placeholder={t('activity.searchActivity')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -132,27 +134,27 @@ export default function ActivityLog() {
         </div>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Type" />
+            <SelectValue placeholder={t('common.all')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="task">Tasks</SelectItem>
-            <SelectItem value="shopping_list">Shopping Lists</SelectItem>
-            <SelectItem value="user">Users</SelectItem>
-            <SelectItem value="suggestion">Suggestions</SelectItem>
-            <SelectItem value="project">Projects</SelectItem>
+            <SelectItem value="all">{t('common.all')}</SelectItem>
+            <SelectItem value="task">{t('nav.tasks')}</SelectItem>
+            <SelectItem value="shopping_list">{t('nav.shoppingLists')}</SelectItem>
+            <SelectItem value="user">{t('nav.staff')}</SelectItem>
+            <SelectItem value="suggestion">{t('nav.suggestions')}</SelectItem>
+            <SelectItem value="project">{t('nav.projects')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={actionFilter} onValueChange={setActionFilter}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Action" />
+            <SelectValue placeholder={t('common.all')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Actions</SelectItem>
-            <SelectItem value="created">Created</SelectItem>
-            <SelectItem value="updated">Updated</SelectItem>
-            <SelectItem value="deleted">Deleted</SelectItem>
-            <SelectItem value="status_changed">Status Changed</SelectItem>
+            <SelectItem value="all">{t('common.all')}</SelectItem>
+            <SelectItem value="created">{t('common.create')}</SelectItem>
+            <SelectItem value="updated">{t('common.edit')}</SelectItem>
+            <SelectItem value="deleted">{t('common.delete')}</SelectItem>
+            <SelectItem value="status_changed">{t('status.inProgress')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -198,7 +200,7 @@ export default function ActivityLog() {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing {startIndex} to {endIndex} of {totalItems} activities
+                {t('common.showing')} {startIndex} - {endIndex} {t('common.of')} {totalItems}
               </p>
               <Pagination
                 currentPage={currentPage}
@@ -213,11 +215,11 @@ export default function ActivityLog() {
           <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
             <Activity className="h-7 w-7 text-muted-foreground" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">No activities found</h3>
+          <h3 className="font-semibold text-lg mb-2">{t('activity.noActivity')}</h3>
           <p className="text-muted-foreground max-w-sm mx-auto">
             {search || typeFilter !== 'all' || actionFilter !== 'all'
-              ? 'Try adjusting your filters to find what you\'re looking for'
-              : 'Activities will appear here as actions are taken in the system'}
+              ? t('activity.noMatching')
+              : t('activity.noActivity')}
           </p>
         </div>
       )}

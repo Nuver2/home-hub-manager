@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +35,7 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export default function Notifications() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: notifications = [], isLoading } = useNotifications();
   const markAsRead = useMarkNotificationRead();
@@ -64,16 +66,16 @@ export default function Notifications() {
     try {
       await markAsRead.mutateAsync(id);
     } catch (error) {
-      toast.error('Failed to mark notification as read');
+      toast.error(t('errors.failedUpdate'));
     }
   };
 
   const handleMarkAllAsRead = async () => {
     try {
       await markAllAsRead.mutateAsync();
-      toast.success('All notifications marked as read');
+      toast.success(t('notifications.markAllRead'));
     } catch (error) {
-      toast.error('Failed to mark all as read');
+      toast.error(t('errors.failedUpdate'));
     }
   };
 
@@ -103,13 +105,13 @@ export default function Notifications() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl lg:text-3xl font-bold">Notifications</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold">{t('notifications.title')}</h1>
             {unreadCount > 0 && (
-              <Badge variant="destructive">{unreadCount} new</Badge>
+              <Badge variant="destructive">{unreadCount} {t('common.new')}</Badge>
             )}
           </div>
           <p className="text-muted-foreground mt-1">
-            Stay updated with your tasks and activities
+            {t('notifications.stayUpdated')}
           </p>
         </div>
         {unreadCount > 0 && (
@@ -119,7 +121,7 @@ export default function Notifications() {
             disabled={markAllAsRead.isPending}
           >
             <CheckCheck className="h-4 w-4" />
-            Mark all as read
+            {t('notifications.markAllRead')}
           </Button>
         )}
       </div>
@@ -182,7 +184,7 @@ export default function Notifications() {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing {startIndex} to {endIndex} of {totalItems} notifications
+                {t('common.showing')} {startIndex} - {endIndex} {t('common.of')} {totalItems}
               </p>
               <Pagination
                 currentPage={currentPage}
@@ -197,9 +199,9 @@ export default function Notifications() {
           <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
             <Bell className="h-7 w-7 text-muted-foreground" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">All caught up!</h3>
+          <h3 className="font-semibold text-lg mb-2">{t('notifications.allCaughtUp')}</h3>
           <p className="text-muted-foreground max-w-sm mx-auto">
-            You have no notifications right now. We'll let you know when something needs your attention.
+            {t('notifications.noNotifications')}
           </p>
         </div>
       )}

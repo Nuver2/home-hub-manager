@@ -112,7 +112,9 @@
     "returnedForFix": "Returned for Fix",
     "pending": "Pending",
     "approved": "Approved",
-    "rejected": "Rejected"
+    "rejected": "Rejected",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "priority": {
     "all": "All Priority",

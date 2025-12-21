@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import { format, isFuture, isPast } from 'date-fns';
 import { useProjects } from '@/hooks/useProjects';
 
 export default function Projects() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: projects = [], isLoading } = useProjects();
   const [search, setSearch] = useState('');
@@ -60,15 +62,15 @@ export default function Projects() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold">Projects</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold">{t('projects.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Organize tasks and shopping lists into projects
+              {t('projects.organize')}
             </p>
           </div>
           <Link to="/projects/new">
             <Button variant="accent">
               <Plus className="h-4 w-4" />
-              New Project
+              {t('projects.newProject')}
             </Button>
           </Link>
         </div>
@@ -77,7 +79,7 @@ export default function Projects() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search projects..."
+            placeholder={t('projects.searchProjects')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -89,7 +91,7 @@ export default function Projects() {
             {/* Upcoming Projects */}
             {upcomingProjects.length > 0 && (
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Upcoming</h2>
+                <h2 className="text-lg font-semibold">{t('projects.upcoming')}</h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {upcomingProjects.map((project, index) => (
                     <Link
@@ -135,7 +137,7 @@ export default function Projects() {
             {/* Past Projects */}
             {pastProjects.length > 0 && (
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-muted-foreground">Past</h2>
+                <h2 className="text-lg font-semibold text-muted-foreground">{t('projects.past')}</h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {pastProjects.map((project, index) => (
                     <Link
@@ -183,16 +185,16 @@ export default function Projects() {
             <div className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
               <FolderKanban className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">No projects found</h3>
+            <h3 className="font-semibold text-lg mb-2">{t('projects.noProjectsFound')}</h3>
             <p className="text-muted-foreground mb-4">
               {search
-                ? 'Try adjusting your search'
-                : 'Get started by creating your first project'}
+                ? t('projects.adjustSearch')
+                : t('projects.createFirst')}
             </p>
             <Link to="/projects/new">
               <Button variant="accent">
                 <Plus className="h-4 w-4" />
-                Create Project
+                {t('projects.createProject')}
               </Button>
             </Link>
           </div>
