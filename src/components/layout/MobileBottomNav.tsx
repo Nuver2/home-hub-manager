@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   CheckSquare,
   ShoppingCart,
-  Bell,
+  BellRing,
   Settings,
 } from 'lucide-react';
 
@@ -27,7 +27,7 @@ export function MobileBottomNav() {
     { label: 'Home', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Tasks', href: '/tasks', icon: CheckSquare },
     { label: 'Shopping', href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
-    { label: 'Alerts', href: '/notifications', icon: Bell, badge: unreadCount },
+    { label: 'Alerts', href: '/notifications', icon: BellRing, badge: unreadCount },
     { label: 'Settings', href: '/settings', icon: Settings },
   ];
 
