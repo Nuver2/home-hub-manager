@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   LayoutDashboard,
   CheckSquare,
@@ -20,9 +21,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { mockNotifications } from '@/data/mockData';
+import { useTranslation } from 'react-i18next';
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: string[];
@@ -30,16 +32,17 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Tasks', href: '/tasks', icon: CheckSquare },
-  { label: 'Shopping Lists', href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
-  { label: 'Projects', href: '/projects', icon: FolderKanban, roles: ['parent'] },
-  { label: 'Staff', href: '/staff', icon: Users, roles: ['parent'] },
-  { label: 'Suggestions', href: '/suggestions', icon: Lightbulb },
-  { label: 'Activity Log', href: '/activity', icon: Activity, roles: ['parent'] },
+  { labelKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { labelKey: 'nav.tasks', href: '/tasks', icon: CheckSquare },
+  { labelKey: 'nav.shoppingLists', href: '/shopping-lists', icon: ShoppingCart, roles: ['parent', 'driver', 'chef'] },
+  { labelKey: 'nav.projects', href: '/projects', icon: FolderKanban, roles: ['parent'] },
+  { labelKey: 'nav.staff', href: '/staff', icon: Users, roles: ['parent'] },
+  { labelKey: 'nav.suggestions', href: '/suggestions', icon: Lightbulb },
+  { labelKey: 'nav.activityLog', href: '/activity', icon: Activity, roles: ['parent'] },
 ];
 
 export function Sidebar() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -52,14 +55,7 @@ export function Sidebar() {
   });
 
   const getRoleLabel = (role: string) => {
-    const labels: Record<string, string> = {
-      parent: 'Administrator',
-      driver: 'Driver',
-      chef: 'Chef',
-      cleaner: 'Cleaner',
-      other: 'Staff',
-    };
-    return labels[role] || role;
+    return t(`roles.${role}`) || role;
   };
 
   const SidebarContent = () => (
@@ -70,8 +66,8 @@ export function Sidebar() {
           <Home className="h-5 w-5 text-sidebar-primary-foreground" />
         </div>
         <div>
-          <h1 className="font-semibold text-sidebar-foreground">HomeHub</h1>
-          <p className="text-xs text-sidebar-foreground/60">Staff Management</p>
+          <h1 className="font-semibold text-sidebar-foreground">{t('app.name')}</h1>
+          <p className="text-xs text-sidebar-foreground/60">{t('app.tagline')}</p>
         </div>
       </div>
 
@@ -109,7 +105,7 @@ export function Sidebar() {
                   )}
                 >
                   <Icon className="h-5 w-5" />
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                   {item.badge && item.badge > 0 && (
                     <Badge variant="warning" className="ml-auto">
                       {item.badge}
@@ -124,13 +120,17 @@ export function Sidebar() {
 
       {/* Bottom Actions */}
       <div className="border-t border-sidebar-border p-3 space-y-1">
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-sm text-sidebar-foreground/60">{t('settings.language')}</span>
+          <LanguageSwitcher variant="compact" />
+        </div>
         <Link
           to="/notifications"
           onClick={() => setIsOpen(false)}
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200"
         >
           <Bell className="h-5 w-5" />
-          <span>Notifications</span>
+          <span>{t('nav.notifications')}</span>
           {unreadNotifications > 0 && (
             <Badge variant="destructive" className="ml-auto">
               {unreadNotifications}
@@ -143,14 +143,14 @@ export function Sidebar() {
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200"
         >
           <Settings className="h-5 w-5" />
-          <span>Settings</span>
+          <span>{t('nav.settings')}</span>
         </Link>
         <button
           onClick={logout}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-destructive/20 hover:text-destructive transition-all duration-200"
         >
           <LogOut className="h-5 w-5" />
-          <span>Sign Out</span>
+          <span>{t('nav.signOut')}</span>
         </button>
       </div>
     </div>
@@ -164,16 +164,19 @@ export function Sidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <Home className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="font-semibold text-base">HomeHub</span>
+          <span className="font-semibold text-base">{t('app.name')}</span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher variant="compact" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
