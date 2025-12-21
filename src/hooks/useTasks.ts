@@ -105,6 +105,7 @@ export function useCreateTask() {
       assigned_roles?: AppRole[];
       project_id?: string;
       assigned_user_ids?: string[];
+      attachments?: string[];
     }) => {
       const { assigned_user_ids, ...taskData } = task;
       

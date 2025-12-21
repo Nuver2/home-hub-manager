@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useShoppingList, useCreateShoppingList, useUpdateShoppingList } from '@/hooks/useShoppingLists';
 import { useStaff } from '@/hooks/useStaff';
 import { useProjects } from '@/hooks/useProjects';
+import { useShoppingListTemplates } from '@/hooks/useShoppingListTemplates';
 import { TaskPriority } from '@/types/database';
 
 interface ItemInput {
@@ -36,6 +37,7 @@ export default function ShoppingListForm() {
   const { data: existingList, isLoading: listLoading } = useShoppingList(id);
   const { data: staff = [] } = useStaff();
   const { data: projects = [] } = useProjects();
+  const { data: templates = [] } = useShoppingListTemplates();
   const createList = useCreateShoppingList();
   const updateList = useUpdateShoppingList();
 
@@ -93,6 +95,20 @@ export default function ShoppingListForm() {
     setItems(prev => prev.map((item, i) => 
       i === index ? { ...item, [field]: value } : item
     ));
+  };
+
+  const loadTemplate = (templateId: string) => {
+    const template = templates.find(t => t.id === templateId);
+    if (template) {
+      setItems(template.items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        details: item.details || '',
+      })));
+      if (template.description) {
+        setFormData(prev => ({ ...prev, notes: template.description || prev.notes }));
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -167,6 +183,29 @@ export default function ShoppingListForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Template Selection */}
+          {!isEditing && templates.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Use Template</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Select onValueChange={loadTemplate}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a template to load items..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map(template => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.name} ({template.items.length} items)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Basic Info */}
           <Card>
             <CardHeader>

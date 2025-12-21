@@ -29,6 +29,8 @@ import { toast } from 'sonner';
 import { useShoppingList, useUpdateShoppingList, useUpdateShoppingListItem, useDeleteShoppingList } from '@/hooks/useShoppingLists';
 import { ShoppingListStatus, ItemStatus } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { Comments } from '@/components/Comments';
+import { ShoppingListItemCard } from '@/components/ShoppingListItemCard';
 
 const priorityVariants: Record<string, 'priority-low' | 'priority-medium' | 'priority-high' | 'priority-urgent'> = {
   low: 'priority-low',
@@ -207,41 +209,20 @@ export default function ShoppingListDetail() {
                 {items.length > 0 ? (
                   <div className="space-y-3">
                     {items.map((item) => (
-                      <div
+                      <ShoppingListItemCard
                         key={item.id}
-                        className="flex items-center gap-4 p-3 border rounded-lg"
-                      >
-                        <div className="shrink-0">
-                          {itemStatusIcons[item.status]}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Qty: {item.quantity} {item.details && `• ${item.details}`}
-                          </p>
-                          {item.driver_comment && (
-                            <p className="text-sm text-warning mt-1">
-                              Note: {item.driver_comment}
-                            </p>
-                          )}
-                        </div>
-                        {canUpdateItems && (
-                          <Select
-                            value={item.status}
-                            onValueChange={(value) => handleItemStatusChange(item.id, value as ItemStatus)}
-                          >
-                            <SelectTrigger className="w-[130px]">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="found">Found</SelectItem>
-                              <SelectItem value="not_found">Not Found</SelectItem>
-                              <SelectItem value="alternative">Alternative</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
+                        item={item}
+                        canUpdate={canUpdateItems}
+                        onStatusChange={(status) => handleItemStatusChange(item.id, status)}
+                        onUpdate={async (updates) => {
+                          try {
+                            await updateItem.mutateAsync({ id: item.id, ...updates });
+                            toast.success('Item updated');
+                          } catch (error) {
+                            toast.error('Failed to update item');
+                          }
+                        }}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -278,6 +259,9 @@ export default function ShoppingListDetail() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Comments */}
+            <Comments shoppingListId={list.id} />
           </div>
 
           {/* Sidebar */}

@@ -25,6 +25,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTask, useUpdateTask, useDeleteTask } from '@/hooks/useTasks';
 import { TaskStatus } from '@/types/database';
+import { Comments } from '@/components/Comments';
 
 const priorityVariants: Record<string, 'priority-low' | 'priority-medium' | 'priority-high' | 'priority-urgent'> = {
   low: 'priority-low',
@@ -163,10 +164,40 @@ export default function TaskDetail() {
               <CardHeader>
                 <CardTitle>Description</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
                   {task.description || 'No description provided.'}
                 </p>
+                {task.attachments && task.attachments.length > 0 && (
+                  <div className="pt-4 border-t">
+                    <p className="text-sm font-medium mb-2">Attachments ({task.attachments.length})</p>
+                    <div className="space-y-2">
+                      {task.attachments.map((url, index) => {
+                        const fileName = url.split('/').pop() || `Attachment ${index + 1}`;
+                        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                        
+                        return (
+                          <a
+                            key={index}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-2 rounded-lg border hover:bg-secondary transition-colors"
+                          >
+                            {isImage ? (
+                              <img src={url} alt={fileName} className="h-12 w-12 object-cover rounded" />
+                            ) : (
+                              <div className="h-12 w-12 flex items-center justify-center bg-secondary rounded text-2xl">
+                                📎
+                              </div>
+                            )}
+                            <span className="text-sm font-medium truncate flex-1">{fileName}</span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -193,6 +224,9 @@ export default function TaskDetail() {
                 </Select>
               </CardContent>
             </Card>
+
+            {/* Comments */}
+            <Comments taskId={task.id} />
           </div>
 
           {/* Sidebar */}

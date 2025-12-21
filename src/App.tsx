@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
 import TaskForm from "./pages/TaskForm";
+import TasksCalendar from "./pages/TasksCalendar";
 import ShoppingLists from "./pages/ShoppingLists";
 import ShoppingListDetail from "./pages/ShoppingListDetail";
 import ShoppingListForm from "./pages/ShoppingListForm";
@@ -115,6 +116,11 @@ function AppRoutes() {
         <Route path="/tasks/:id/edit" element={
           <ProtectedRoute>
             <TaskForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/tasks/calendar" element={
+          <ProtectedRoute>
+            <TasksCalendar />
           </ProtectedRoute>
         } />
 

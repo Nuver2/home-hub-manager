@@ -20,8 +20,8 @@ import {
   Bell,
 } from 'lucide-react';
 import { useState } from 'react';
-import { mockNotifications } from '@/data/mockData';
 import { useTranslation } from 'react-i18next';
+import { useUnreadNotificationsCount } from '@/hooks/useNotifications';
 
 interface NavItem {
   labelKey: string;
@@ -46,8 +46,7 @@ export function Sidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-
-  const unreadNotifications = mockNotifications.filter(n => !n.read).length;
+  const { data: unreadNotifications = 0 } = useUnreadNotificationsCount();
 
   const filteredNavItems = navItems.filter(item => {
     if (!item.roles) return true;

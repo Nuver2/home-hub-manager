@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ import { useTask, useCreateTask, useUpdateTask } from '@/hooks/useTasks';
 import { useStaff } from '@/hooks/useStaff';
 import { useProjects } from '@/hooks/useProjects';
 import { TaskPriority, TaskStatus, TaskCategory } from '@/types/database';
+import { FileUpload } from '@/components/FileUpload';
 
 export default function TaskForm() {
   const { id } = useParams<{ id: string }>();
@@ -44,6 +46,11 @@ export default function TaskForm() {
     location: '',
     project_id: '',
     assigned_user_ids: [] as string[],
+    attachments: [] as string[],
+    is_recurring: false,
+    recurrence_pattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
+    recurrence_interval: 1,
+    recurrence_end_date: '',
   });
 
   useEffect(() => {
@@ -58,6 +65,11 @@ export default function TaskForm() {
         location: existingTask.location || '',
         project_id: existingTask.project_id || '',
         assigned_user_ids: existingTask.assignedUsers?.map(u => u.id) || [],
+        attachments: existingTask.attachments || [],
+        is_recurring: (existingTask as any).is_recurring || false,
+        recurrence_pattern: (existingTask as any).recurrence_pattern || 'weekly',
+        recurrence_interval: (existingTask as any).recurrence_interval || 1,
+        recurrence_end_date: (existingTask as any).recurrence_end_date ? new Date((existingTask as any).recurrence_end_date).toISOString().split('T')[0] : '',
       });
     }
   }, [existingTask]);
@@ -86,6 +98,11 @@ export default function TaskForm() {
         location: formData.location || undefined,
         project_id: formData.project_id || undefined,
         assigned_user_ids: formData.assigned_user_ids,
+        attachments: formData.attachments.length > 0 ? formData.attachments : undefined,
+        is_recurring: formData.is_recurring,
+        recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : undefined,
+        recurrence_interval: formData.is_recurring ? formData.recurrence_interval : undefined,
+        recurrence_end_date: formData.is_recurring && formData.recurrence_end_date ? formData.recurrence_end_date : undefined,
       };
 
       if (isEditing && existingTask) {
@@ -290,6 +307,84 @@ export default function TaskForm() {
                     <p className="text-sm text-muted-foreground col-span-2">No staff members available</p>
                   )}
                 </div>
+              </div>
+
+              {/* Attachments */}
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <FileUpload
+                  bucket="attachments"
+                  folder="tasks"
+                  existingFiles={formData.attachments}
+                  onUploadComplete={(url) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      attachments: [...prev.attachments, url],
+                    }));
+                  }}
+                  onRemove={(url) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      attachments: prev.attachments.filter(a => a !== url),
+                    }));
+                  }}
+                  maxFiles={5}
+                  maxSizeMB={10}
+                />
+              </div>
+
+              {/* Recurring Task */}
+              <div className="space-y-4 p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Recurring Task</Label>
+                    <p className="text-sm text-muted-foreground">Create this task on a schedule</p>
+                  </div>
+                  <Switch
+                    checked={formData.is_recurring}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_recurring: checked }))}
+                  />
+                </div>
+                {formData.is_recurring && (
+                  <div className="space-y-4 pt-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Repeat Every</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min="1"
+                            value={formData.recurrence_interval}
+                            onChange={(e) => setFormData(prev => ({ ...prev, recurrence_interval: parseInt(e.target.value) || 1 }))}
+                            className="w-20"
+                          />
+                          <Select
+                            value={formData.recurrence_pattern}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, recurrence_pattern: value as any }))}
+                          >
+                            <SelectTrigger className="flex-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="daily">Day(s)</SelectItem>
+                              <SelectItem value="weekly">Week(s)</SelectItem>
+                              <SelectItem value="monthly">Month(s)</SelectItem>
+                              <SelectItem value="yearly">Year(s)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>End Date (Optional)</Label>
+                        <Input
+                          type="date"
+                          value={formData.recurrence_end_date}
+                          onChange={(e) => setFormData(prev => ({ ...prev, recurrence_end_date: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Actions */}
