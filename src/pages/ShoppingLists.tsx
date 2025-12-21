@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
@@ -34,6 +35,7 @@ import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function ShoppingLists() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: shoppingLists = [], isLoading } = useShoppingLists();
@@ -83,12 +85,12 @@ export default function ShoppingLists() {
   } = useBulkSelection({ items: paginatedData });
 
   const statusTabs = [
-    { value: 'all', label: 'All' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'assigned', label: 'Assigned' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'delivered', label: 'Delivered' },
-    { value: 'completed', label: 'Completed' },
+    { value: 'all', label: t('status.all') },
+    { value: 'draft', label: t('status.draft') },
+    { value: 'assigned', label: t('status.assigned') },
+    { value: 'in_progress', label: t('status.inProgress') },
+    { value: 'delivered', label: t('status.delivered') },
+    { value: 'completed', label: t('status.completed') },
   ];
 
   const handleRefresh = useCallback(async () => {
@@ -102,10 +104,10 @@ export default function ShoppingLists() {
           updateList.mutateAsync({ id, status: 'completed' })
         )
       );
-      toast.success(`${selectedCount} lists marked as completed`);
+      toast.success(`${selectedCount} ${t('shoppingLists.markedCompleted')}`);
       deselectAll();
     } catch {
-      toast.error('Failed to update lists');
+      toast.error(t('errors.failedUpdate'));
     }
   };
 
@@ -114,10 +116,10 @@ export default function ShoppingLists() {
       await Promise.all(
         Array.from(selectedIds).map(id => deleteList.mutateAsync(id))
       );
-      toast.success(`${selectedCount} lists deleted`);
+      toast.success(`${selectedCount} ${t('shoppingLists.deleted')}`);
       deselectAll();
     } catch {
-      toast.error('Failed to delete lists');
+      toast.error(t('errors.failedDelete'));
     }
   };
 
@@ -151,20 +153,20 @@ export default function ShoppingLists() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Shopping Lists</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold">{t('shoppingLists.title')}</h1>
           <p className="text-muted-foreground mt-1">
             {isParent 
-              ? 'Manage all shopping lists' 
+              ? t('shoppingLists.manageAll')
               : isChef 
-                ? 'Create and manage your shopping lists'
-                : 'View your assigned shopping lists'}
+                ? t('shoppingLists.createManage')
+                : t('shoppingLists.viewAssigned')}
           </p>
         </div>
         {(isParent || isChef) && (
           <Link to="/shopping-lists/new">
             <Button variant="accent">
               <Plus className="h-4 w-4" />
-              New List
+              {t('shoppingLists.newList')}
             </Button>
           </Link>
         )}
@@ -209,7 +211,7 @@ export default function ShoppingLists() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search shopping lists..."
+            placeholder={t('shoppingLists.searchLists')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 h-11"
@@ -217,14 +219,14 @@ export default function ShoppingLists() {
         </div>
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Priority" />
+            <SelectValue placeholder={t('priority.all')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Priority</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="urgent">Urgent</SelectItem>
+            <SelectItem value="all">{t('priority.all')}</SelectItem>
+            <SelectItem value="low">{t('priority.low')}</SelectItem>
+            <SelectItem value="medium">{t('priority.medium')}</SelectItem>
+            <SelectItem value="high">{t('priority.high')}</SelectItem>
+            <SelectItem value="urgent">{t('priority.urgent')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -238,7 +240,7 @@ export default function ShoppingLists() {
             className="data-[state=indeterminate]:bg-primary"
             {...(isSomeSelected ? { 'data-state': 'indeterminate' } : {})}
           />
-          <span>Select all ({paginatedData.length} items)</span>
+          <span>{t('common.selectAll')} ({paginatedData.length} {t('common.items')})</span>
         </div>
       )}
 
@@ -266,7 +268,7 @@ export default function ShoppingLists() {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing {startIndex} to {endIndex} of {totalItems} lists
+                {t('common.showing')} {startIndex} - {endIndex} {t('common.of')} {totalItems}
               </p>
               <Pagination
                 currentPage={currentPage}
@@ -281,17 +283,17 @@ export default function ShoppingLists() {
           <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
             <ShoppingCart className="h-6 w-6 text-muted-foreground" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">No shopping lists found</h3>
+          <h3 className="font-semibold text-lg mb-2">{t('shoppingLists.noListsFound')}</h3>
           <p className="text-muted-foreground mb-4">
             {search || statusFilter !== 'all' || priorityFilter !== 'all'
-              ? 'Try adjusting your filters'
-              : 'Get started by creating your first shopping list'}
+              ? t('shoppingLists.adjustFilters')
+              : t('shoppingLists.createFirst')}
           </p>
           {(isParent || isChef) && (
             <Link to="/shopping-lists/new">
               <Button variant="accent">
                 <Plus className="h-4 w-4" />
-                Create Shopping List
+                {t('shoppingLists.createList')}
               </Button>
             </Link>
           )}
@@ -308,7 +310,7 @@ export default function ShoppingLists() {
             className="text-primary-foreground hover:bg-primary-foreground/20"
           >
             <CheckCircle className="h-4 w-4 mr-1" />
-            Complete
+            {t('common.complete')}
           </Button>
           <Button
             variant="ghost"
@@ -317,7 +319,7 @@ export default function ShoppingLists() {
             className="text-primary-foreground hover:bg-primary-foreground/20"
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Delete
+            {t('common.delete')}
           </Button>
         </BulkActionsBar>
       )}

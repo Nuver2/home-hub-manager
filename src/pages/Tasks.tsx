@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
@@ -36,6 +37,7 @@ import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Tasks() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: tasks = [], isLoading } = useTasks();
@@ -106,10 +108,10 @@ export default function Tasks() {
           updateTask.mutateAsync({ id, status: 'completed' })
         )
       );
-      toast.success(`${selectedCount} tasks marked as completed`);
+      toast.success(`${selectedCount} ${t('tasks.markedCompleted')}`);
       deselectAll();
     } catch {
-      toast.error('Failed to update tasks');
+      toast.error(t('errors.failedUpdate'));
     }
   };
 
@@ -118,10 +120,10 @@ export default function Tasks() {
       await Promise.all(
         Array.from(selectedIds).map(id => deleteTask.mutateAsync(id))
       );
-      toast.success(`${selectedCount} tasks deleted`);
+      toast.success(`${selectedCount} ${t('tasks.deleted')}`);
       deselectAll();
     } catch {
-      toast.error('Failed to delete tasks');
+      toast.error(t('errors.failedDelete'));
     }
   };
 
@@ -155,16 +157,16 @@ export default function Tasks() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Tasks</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold">{t('tasks.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {isParent ? 'Manage all household tasks' : 'View your assigned tasks'}
+            {isParent ? t('tasks.manageAll') : t('tasks.viewAssigned')}
           </p>
         </div>
         {isParent && (
           <Link to="/tasks/new">
             <Button variant="accent">
               <Plus className="h-4 w-4" />
-              New Task
+              {t('tasks.newTask')}
             </Button>
           </Link>
         )}
@@ -173,11 +175,11 @@ export default function Tasks() {
       {/* Status Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0 scrollbar-hide">
         {[
-          { value: 'all', label: 'All', count: statusCounts.all },
-          { value: 'to_do', label: 'To Do', count: statusCounts.to_do },
-          { value: 'in_progress', label: 'In Progress', count: statusCounts.in_progress },
-          { value: 'completed', label: 'Completed', count: statusCounts.completed },
-          { value: 'on_hold', label: 'On Hold', count: statusCounts.on_hold },
+          { value: 'all', label: t('status.all'), count: statusCounts.all },
+          { value: 'to_do', label: t('status.toDo'), count: statusCounts.to_do },
+          { value: 'in_progress', label: t('status.inProgress'), count: statusCounts.in_progress },
+          { value: 'completed', label: t('status.completed'), count: statusCounts.completed },
+          { value: 'on_hold', label: t('status.onHold'), count: statusCounts.on_hold },
         ].map((tab) => (
           <button
             key={tab.value}
@@ -207,7 +209,7 @@ export default function Tasks() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search tasks..."
+            placeholder={t('tasks.searchTasks')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 h-11"
@@ -216,28 +218,28 @@ export default function Tasks() {
         <div className="flex gap-2">
           <Select value={priorityFilter} onValueChange={setPriorityFilter}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Priority" />
+              <SelectValue placeholder={t('priority.all')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Priority</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
+              <SelectItem value="all">{t('priority.all')}</SelectItem>
+              <SelectItem value="low">{t('priority.low')}</SelectItem>
+              <SelectItem value="medium">{t('priority.medium')}</SelectItem>
+              <SelectItem value="high">{t('priority.high')}</SelectItem>
+              <SelectItem value="urgent">{t('priority.urgent')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={t('category.all')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="cleaning">Cleaning</SelectItem>
-              <SelectItem value="kitchen">Kitchen</SelectItem>
-              <SelectItem value="driving">Driving</SelectItem>
-              <SelectItem value="shopping">Shopping</SelectItem>
-              <SelectItem value="maintenance">Maintenance</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="all">{t('category.all')}</SelectItem>
+              <SelectItem value="cleaning">{t('category.cleaning')}</SelectItem>
+              <SelectItem value="kitchen">{t('category.kitchen')}</SelectItem>
+              <SelectItem value="driving">{t('category.driving')}</SelectItem>
+              <SelectItem value="shopping">{t('category.shopping')}</SelectItem>
+              <SelectItem value="maintenance">{t('category.maintenance')}</SelectItem>
+              <SelectItem value="other">{t('category.other')}</SelectItem>
             </SelectContent>
           </Select>
           <div className="flex rounded-lg border bg-secondary p-1">
@@ -270,7 +272,7 @@ export default function Tasks() {
             className="data-[state=indeterminate]:bg-primary"
             {...(isSomeSelected ? { 'data-state': 'indeterminate' } : {})}
           />
-          <span>Select all ({paginatedData.length} items)</span>
+          <span>{t('common.selectAll')} ({paginatedData.length} {t('common.items')})</span>
         </div>
       )}
 
@@ -309,7 +311,7 @@ export default function Tasks() {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
               <p className="text-sm text-muted-foreground">
-                Showing {startIndex} to {endIndex} of {totalItems} tasks
+                {t('common.showing')} {startIndex} - {endIndex} {t('common.of')} {totalItems}
               </p>
               <Pagination
                 currentPage={currentPage}
@@ -324,17 +326,17 @@ export default function Tasks() {
           <div className="mx-auto w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <Search className="h-7 w-7 text-muted-foreground" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">No tasks found</h3>
+          <h3 className="font-semibold text-lg mb-2">{t('tasks.noTasksFound')}</h3>
           <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
             {search || statusFilter !== 'all' || priorityFilter !== 'all' || categoryFilter !== 'all'
-              ? 'Try adjusting your search or filters to find what you\'re looking for'
-              : 'Get started by creating your first task'}
+              ? t('tasks.adjustFilters')
+              : t('tasks.createFirst')}
           </p>
           {isParent && (
             <Link to="/tasks/new">
               <Button variant="accent" size="lg" className="touch-feedback">
                 <Plus className="h-4 w-4" />
-                Create Your First Task
+                {t('tasks.createFirstTask')}
               </Button>
             </Link>
           )}
@@ -351,7 +353,7 @@ export default function Tasks() {
             className="text-primary-foreground hover:bg-primary-foreground/20"
           >
             <CheckCircle className="h-4 w-4 mr-1" />
-            Complete
+            {t('common.complete')}
           </Button>
           <Button
             variant="ghost"
@@ -360,7 +362,7 @@ export default function Tasks() {
             className="text-primary-foreground hover:bg-primary-foreground/20"
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Delete
+            {t('common.delete')}
           </Button>
         </BulkActionsBar>
       )}
