@@ -74,8 +74,10 @@ export default function TaskDetail() {
     try {
       await updateTask.mutateAsync({ id: task.id, status });
       toast.success('Task status updated');
-    } catch (error) {
-      toast.error('Failed to update status');
+    } catch (error: any) {
+      console.error('Status update error:', error);
+      const errorMessage = error?.message || error?.error_description || 'Failed to update status';
+      toast.error(errorMessage);
     }
   };
 
