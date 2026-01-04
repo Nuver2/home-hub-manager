@@ -3,6 +3,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
+    "deleting": "Deleting...",
     "edit": "Edit",
     "create": "Create",
     "search": "Search",
@@ -159,7 +160,13 @@
     "drivers": "Drivers",
     "chefs": "Chefs",
     "cleaners": "Cleaners",
-    "other": "Other"
+    "other": "Other",
+    "deleteConfirmTitle": "Delete Staff Member",
+    "deleteConfirmDescription": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+    "deleteSuccess": "Staff member deleted",
+    "deleteSuccessDescription": "{{name}} has been removed from the staff list.",
+    "deleteError": "Failed to delete staff member",
+    "deleteErrorDescription": "An error occurred while deleting the staff member. Please try again."
   },
   "projects": {
     "title": "Projects",

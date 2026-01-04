@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppRole } from '@/types/database';
 
@@ -89,6 +89,39 @@ export function useAllUsersWithRoles() {
       });
       
       return usersWithRoles;
+    },
+  });
+}
+
+export function useDeleteStaff() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      // Delete user roles first (foreign key constraint)
+      const { error: rolesError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (rolesError) throw rolesError;
+      
+      // Delete profile (this will cascade delete related data)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+      
+      if (profileError) throw profileError;
+      
+      // Note: The auth user will remain in auth.users
+      // To fully delete, you'd need an Edge Function with service role
+      // For now, we just delete the profile and roles
+    },
+    onSuccess: () => {
+      // Invalidate and refetch staff list
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+      queryClient.invalidateQueries({ queryKey: ['all-users-with-roles'] });
     },
   });
 }

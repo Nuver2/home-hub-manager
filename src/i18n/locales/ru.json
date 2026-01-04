@@ -3,6 +3,7 @@
     "save": "Сохранить",
     "cancel": "Отмена",
     "delete": "Удалить",
+    "deleting": "Удаление...",
     "edit": "Редактировать",
     "create": "Создать",
     "search": "Поиск",
@@ -160,7 +161,13 @@
     "drivers": "Водители",
     "chefs": "Повара",
     "cleaners": "Уборщики",
-    "other": "Другие"
+    "other": "Другие",
+    "deleteConfirmTitle": "Удалить сотрудника",
+    "deleteConfirmDescription": "Вы уверены, что хотите удалить {{name}}? Это действие нельзя отменить.",
+    "deleteSuccess": "Сотрудник удален",
+    "deleteSuccessDescription": "{{name}} был удален из списка персонала.",
+    "deleteError": "Не удалось удалить сотрудника",
+    "deleteErrorDescription": "Произошла ошибка при удалении сотрудника. Пожалуйста, попробуйте снова."
   },
   "projects": {
     "title": "Проекты",

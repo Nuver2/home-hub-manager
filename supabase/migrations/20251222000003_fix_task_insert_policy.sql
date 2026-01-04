@@ -12,3 +12,5 @@ CREATE POLICY "Parents can manage all tasks"
   USING (public.has_role(auth.uid(), 'parent'))
   WITH CHECK (public.has_role(auth.uid(), 'parent'));
 
+
+

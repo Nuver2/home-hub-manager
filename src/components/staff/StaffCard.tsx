@@ -1,16 +1,32 @@
-import { StaffMember } from '@/hooks/useStaff';
+import { StaffMember, useDeleteStaff } from '@/hooks/useStaff';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Phone,
   MoreHorizontal,
   Calendar,
+  Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/hooks/use-toast';
 
 interface StaffCardProps {
   user: StaffMember;
   onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const roleLabels: Record<string, string> = {
@@ -29,7 +45,32 @@ const roleVariants: Record<string, 'parent' | 'driver' | 'chef' | 'cleaner' | 'o
   other: 'other',
 };
 
-export function StaffCard({ user, onEdit }: StaffCardProps) {
+export function StaffCard({ user, onEdit, onDelete }: StaffCardProps) {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const deleteStaff = useDeleteStaff();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteStaff.mutateAsync(user.id);
+      toast({
+        title: t('staff.deleteSuccess'),
+        description: t('staff.deleteSuccessDescription', { name: user.name }),
+      });
+      onDelete?.();
+    } catch (error: any) {
+      toast({
+        title: t('staff.deleteError'),
+        description: error.message || t('staff.deleteErrorDescription'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-medium animate-fade-in">
       <div className="flex items-start gap-4">
@@ -53,11 +94,40 @@ export function StaffCard({ user, onEdit }: StaffCardProps) {
             <span className="text-sm text-muted-foreground">@{user.username}</span>
           </div>
         </div>
-        {onEdit && (
-          <Button variant="ghost" size="icon" onClick={onEdit}>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {onEdit && (
+            <Button variant="ghost" size="icon" onClick={onEdit}>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('staff.deleteConfirmTitle')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t('staff.deleteConfirmDescription', { name: user.name })}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeleting}>
+                  {t('common.cancel')}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isDeleting ? t('common.deleting') : t('common.delete')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-border text-sm">
