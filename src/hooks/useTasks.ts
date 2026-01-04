@@ -169,23 +169,30 @@ export function useUpdateTask() {
       recurrence_interval?: number;
       recurrence_end_date?: string;
     }) => {
-      // Prepare update data, only include recurring fields if is_recurring is true
+      // Prepare update data, only include fields that are explicitly provided
       const updateData: any = { ...updates };
       
+      // Only include recurring fields if they're explicitly provided
       if (is_recurring !== undefined) {
         updateData.is_recurring = is_recurring;
+        
+        // If explicitly setting to non-recurring, clear recurring fields
+        if (is_recurring === false) {
+          updateData.recurrence_pattern = null;
+          updateData.recurrence_interval = 1; // Set to default instead of null (column is NOT NULL)
+          updateData.recurrence_end_date = null;
+        }
       }
       
-      // Only include recurring fields if task is recurring
-      if (is_recurring) {
-        if (recurrence_pattern !== undefined) updateData.recurrence_pattern = recurrence_pattern;
-        if (recurrence_interval !== undefined) updateData.recurrence_interval = recurrence_interval;
-        if (recurrence_end_date !== undefined) updateData.recurrence_end_date = recurrence_end_date;
-      } else {
-        // Clear recurring fields if task is not recurring
-        updateData.recurrence_pattern = null;
-        updateData.recurrence_interval = null;
-        updateData.recurrence_end_date = null;
+      // Only include recurring fields if they're explicitly provided
+      if (recurrence_pattern !== undefined) {
+        updateData.recurrence_pattern = recurrence_pattern;
+      }
+      if (recurrence_interval !== undefined) {
+        updateData.recurrence_interval = recurrence_interval;
+      }
+      if (recurrence_end_date !== undefined) {
+        updateData.recurrence_end_date = recurrence_end_date;
       }
       
       const { data, error } = await supabase
