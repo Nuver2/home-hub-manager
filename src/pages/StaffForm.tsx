@@ -45,8 +45,24 @@ export default function StaffForm() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    // Validate password to match edge function requirements
+    if (formData.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    
+    if (!/[A-Z]/.test(formData.password)) {
+      toast.error('Password must contain at least one uppercase letter');
+      return;
+    }
+    
+    if (!/[a-z]/.test(formData.password)) {
+      toast.error('Password must contain at least one lowercase letter');
+      return;
+    }
+    
+    if (!/[0-9]/.test(formData.password)) {
+      toast.error('Password must contain at least one number');
       return;
     }
 
@@ -71,6 +87,12 @@ export default function StaffForm() {
         },
       });
 
+      // Check if response.data contains an error (edge function returned error in body)
+      if (response.data && typeof response.data === 'object' && 'error' in response.data) {
+        const errorMsg = response.data.error as string;
+        throw new Error(errorMsg);
+      }
+
       if (response.error) {
         // Check if it's a 404 (function not deployed)
         if (response.error.message?.includes('404') || response.error.message?.includes('not found')) {
@@ -79,11 +101,6 @@ export default function StaffForm() {
         // Try to extract error message from response
         const errorMsg = response.error.message || response.error.context?.msg || 'Unknown error';
         throw new Error(errorMsg);
-      }
-
-      // Check if response.data contains an error
-      if (response.data && typeof response.data === 'object' && 'error' in response.data) {
-        throw new Error(response.data.error as string);
       }
 
       // Check if response itself indicates an error
@@ -179,12 +196,12 @@ export default function StaffForm() {
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters with uppercase, lowercase, and number"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <p className="text-xs text-muted-foreground">
-                  The staff member will use this password to log in
+                  Must be at least 8 characters with uppercase, lowercase, and number
                 </p>
               </div>
 
