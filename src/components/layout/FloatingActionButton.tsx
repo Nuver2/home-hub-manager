@@ -94,7 +94,7 @@ export function FloatingActionButton() {
       {/* Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-background/60 backdrop-blur-[2px] z-[30]"
+          className="fixed inset-0 bg-background/60 z-[30]"
           onClick={() => setIsOpen(false)}
         />
       )}
